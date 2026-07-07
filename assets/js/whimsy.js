@@ -25,26 +25,64 @@
  }catch(e){EMO=RAW.split(/(?:)/u).filter(function(s){return s.trim();});}
  for(var i=EMO.length-1;i>0;i--){var j=Math.random()*(i+1)|0;var t0=EMO[i];EMO[i]=EMO[j];EMO[j]=t0;}
  var oi=0,lastX=null,lastY=null,acc=0,painting=false;
- function crumb(x,y){
-  var s=document.createElement('span');
-  s.className='wcrumb';
-  s.textContent=EMO[oi++%EMO.length];
-  var size=13+Math.random()*7;
-  s.style.cssText='position:fixed;left:'+(x-size/2)+'px;top:'+(y-size/2)+
-   'px;font-size:'+size+'px;pointer-events:none;z-index:60;filter:'+TINT;
-  document.body.appendChild(s);
-  liveCrumbs++;
-  if(s.animate){
-   s.animate([{opacity:.95,transform:'scale(1) translateY(0) rotate(0deg)'},
-    {opacity:0,transform:'scale(.1) translateY('+(6+Math.random()*10)+'px) rotate('+(Math.random()*36-18)+'deg)'}],
-    {duration:1000,easing:'ease-out',fill:'forwards'});
-  }
-  setTimeout(function(){s.remove();liveCrumbs--;},1020);
+ /* the trail lives on ONE fixed canvas: one compositor layer, one tint filter,
+    sprites drawn in a rAF loop. the old way (a DOM span + its own CSS filter
+    per emoji) piled up 100+ filtered layers and stuttered on weaker machines. */
+ var tcv=null,tcx=null,tcrumbs=[],trailRaf=0;
+ function sizeTrailCv(){
+  if(!tcv)return;
+  var d=Math.min(2,window.devicePixelRatio||1);
+  tcv.width=Math.round(innerWidth*d);tcv.height=Math.round(innerHeight*d);
+  tcx=tcv.getContext('2d');
+  tcx.setTransform(d,0,0,d,0,0);
+  tcx.textAlign='center';tcx.textBaseline='middle';
  }
+ function trailCanvas(){
+  if(tcv)return;
+  tcv=document.createElement('canvas');
+  tcv.className='wtrailcv';
+  tcv.setAttribute('aria-hidden','true');
+  tcv.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:60;filter:'+TINT;
+  document.body.appendChild(tcv);
+  sizeTrailCv();
+  window.addEventListener('resize',sizeTrailCv);
+ }
+ function drawTrail(){
+  trailRaf=0;
+  if(!tcx)return;
+  var now=performance.now();
+  tcx.clearRect(0,0,innerWidth,innerHeight);
+  var live=[];
+  for(var i=0;i<tcrumbs.length;i++){
+   var c=tcrumbs[i],a=(now-c.t)/1000;
+   if(a>=1)continue;
+   live.push(c);
+   var k=1-a;
+   tcx.save();
+   tcx.globalAlpha=.95*k;
+   tcx.translate(c.x,c.y+c.dy*a);
+   tcx.rotate(c.r*Math.PI/180*a);
+   tcx.scale(.1+.9*k,.1+.9*k);
+   tcx.font=c.s+'px serif';
+   tcx.fillText(c.e,0,0);
+   tcx.restore();
+  }
+  tcrumbs=live;
+  if(tcrumbs.length)trailRaf=requestAnimationFrame(drawTrail);
+ }
+ function crumb(x,y){
+  trailCanvas();
+  tcrumbs.push({e:EMO[oi++%EMO.length],x:x,y:y,t:performance.now(),
+   s:13+Math.random()*7,r:Math.random()*36-18,dy:6+Math.random()*10});
+  if(tcrumbs.length>200)tcrumbs.splice(0,tcrumbs.length-200);
+  if(!trailRaf)trailRaf=requestAnimationFrame(drawTrail);
+ }
+ window.__wTrailCount=function(){return tcrumbs.length;};
+ window.__wTrailXs=function(){return tcrumbs.map(function(c){return Math.round(c.x);});};
+ window.__wTrailClear=function(){tcrumbs=[];if(tcx)tcx.clearRect(0,0,innerWidth,innerHeight);};
  /* a real trail: crumbs are laid ALONG the travelled path, every ~15px, not
     one per mouse event. fast mouse events cover big jumps, so a single event
     may drop several crumbs; a cap keeps wild flicks from flooding the page. */
- var liveCrumbs=0;
  document.addEventListener('pointermove',function(e){
   var px0=lastX,py0=lastY;
   var wasNull=(lastX===null);
@@ -54,7 +92,7 @@
   acc+=Math.hypot(e.clientX-px0,e.clientY-py0);
   if(acc<15)return;
   var steps=Math.min(Math.floor(acc/15),7);
-  if(liveCrumbs>140)steps=1;
+  if(tcrumbs.length>140)steps=1;
   for(var s=1;s<=steps;s++){
    var f=s/steps;
    crumb(px0+(e.clientX-px0)*f,py0+(e.clientY-py0)*f);
@@ -66,6 +104,7 @@
   crumb(lastX+(Math.random()*14-7),lastY+(Math.random()*14-7));
  },100);
  window.addEventListener('dv:mode',function(){
+  if(mode()!=='whimsy'&&window.__wTrailClear)window.__wTrailClear();
   if(mode()==='whimsy'&&trailOn()&&lastX!==null){
    crumb(lastX,lastY);
    setTimeout(function(){if(mode()==='whimsy')crumb(lastX+8,lastY+6);},150);
@@ -110,10 +149,13 @@
   clearTimeout(tipEl.__t);
   tipEl.__t=setTimeout(function(){tipEl.style.display='none';},1200);
  }
+ function snapPixels(){return cx.getImageData(0,0,cv.width,cv.height);}
  function pushUndo(){
+  /* raw pixels: a memory copy in a millisecond or two. PNG-encoding here used
+     to stall the main thread at the START of every stroke. */
   try{
-   undoStack.push(cv.toDataURL('image/png'));
-   if(undoStack.length>12)undoStack.shift();
+   undoStack.push(snapPixels());
+   if(undoStack.length>6)undoStack.shift();
    redoStack.length=0;
   }catch(e){}
  }
@@ -129,18 +171,17 @@
   };
   img.src=url;
  }
- var restoring=false;
  function undo(){
-  if(!undoStack.length||restoring)return;
-  restoring=true;
-  redoStack.push(cv.toDataURL('image/png'));
-  restore(undoStack.pop(),function(){restoring=false;saveDrawing();});
+  if(!undoStack.length)return;
+  redoStack.push(snapPixels());
+  cx.putImageData(undoStack.pop(),0,0);
+  saveDrawing();
  }
  function redo(){
-  if(!redoStack.length||restoring)return;
-  restoring=true;
-  undoStack.push(cv.toDataURL('image/png'));
-  restore(redoStack.pop(),function(){restoring=false;saveDrawing();});
+  if(!redoStack.length)return;
+  undoStack.push(snapPixels());
+  cx.putImageData(redoStack.pop(),0,0);
+  saveDrawing();
  }
  function clearAll(){
   pushUndo();
@@ -151,6 +192,16 @@
  var saveT=null,lastSaveAt=0;
  function doSave(){
   lastSaveAt=Date.now();
+  try{
+   cv.toBlob(function(b){
+    if(!b)return;
+    var fr=new FileReader();
+    fr.onload=function(){try{localStorage.setItem('dvPaint',fr.result);}catch(e){}};
+    fr.readAsDataURL(b);
+   },'image/png');
+  }catch(e){}
+ }
+ function doSaveSync(){
   try{localStorage.setItem('dvPaint',cv.toDataURL('image/png'));}catch(e){}
  }
  function saveDrawing(){
@@ -160,7 +211,7 @@
   if(since>800)doSave();
   else saveT=setTimeout(function(){saveT=null;doSave();},820-since);
  }
- window.addEventListener('pagehide',function(){if(saveT){clearTimeout(saveT);saveT=null;doSave();}});
+ window.addEventListener('pagehide',function(){if(saveT){clearTimeout(saveT);saveT=null;doSaveSync();}});
  /* flatten for download/share: white paper underneath, stickers sitting on the
     drawing come along for the ride */
  function exportCanvas(cb){
@@ -634,7 +685,7 @@
   lensWrap.innerHTML='';
   lensWrap.style.width=document.documentElement.scrollWidth+'px';
   var c=document.body.cloneNode(true);
-  c.querySelectorAll('script,.wlens,.wcrumb,.lightbox,.wtrailtog').forEach(function(x){x.remove();});
+  c.querySelectorAll('script,.wlens,.wcrumb,.wtrailcv,.lightbox,.wtrailtog').forEach(function(x){x.remove();});
   c.style.margin='0';
   var st=document.createElement('style');
   st.textContent='*{animation:none!important;transition:none!important}';
