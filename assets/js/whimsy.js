@@ -33,22 +33,33 @@
   s.style.cssText='position:fixed;left:'+(x-size/2)+'px;top:'+(y-size/2)+
    'px;font-size:'+size+'px;pointer-events:none;z-index:60;filter:'+TINT;
   document.body.appendChild(s);
+  liveCrumbs++;
   if(s.animate){
    s.animate([{opacity:.95,transform:'scale(1) translateY(0) rotate(0deg)'},
     {opacity:0,transform:'scale(.1) translateY('+(6+Math.random()*10)+'px) rotate('+(Math.random()*36-18)+'deg)'}],
     {duration:1000,easing:'ease-out',fill:'forwards'});
   }
-  setTimeout(function(){s.remove();},1020);
+  setTimeout(function(){s.remove();liveCrumbs--;},1020);
  }
+ /* a real trail: crumbs are laid ALONG the travelled path, every ~15px, not
+    one per mouse event. fast mouse events cover big jumps, so a single event
+    may drop several crumbs; a cap keeps wild flicks from flooding the page. */
+ var liveCrumbs=0;
  document.addEventListener('pointermove',function(e){
+  var px0=lastX,py0=lastY;
   var wasNull=(lastX===null);
-  if(lastX!==null)acc+=Math.hypot(e.clientX-lastX,e.clientY-lastY);
   lastX=e.clientX;lastY=e.clientY;
   if(mode()!=='whimsy'||painting||!trailOn())return;
   if(wasNull){crumb(lastX,lastY);return;}
-  if(acc<6)return;
+  acc+=Math.hypot(e.clientX-px0,e.clientY-py0);
+  if(acc<15)return;
+  var steps=Math.min(Math.floor(acc/15),7);
+  if(liveCrumbs>140)steps=1;
+  for(var s=1;s<=steps;s++){
+   var f=s/steps;
+   crumb(px0+(e.clientX-px0)*f,py0+(e.clientY-py0)*f);
+  }
   acc=0;
-  crumb(e.clientX,e.clientY);
  },{passive:true});
  setInterval(function(){
   if(mode()!=='whimsy'||painting||lastX===null||!trailOn())return;
