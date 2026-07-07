@@ -96,7 +96,7 @@ clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%)}
 backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .pface.back{transform:rotateY(180deg)}
 .pface .sheet{position:absolute;top:0;left:0}
-.psh{position:absolute;inset:0;pointer-events:none;opacity:0;animation:pshIn 720ms linear forwards}
+.psh{position:absolute;inset:0;pointer-events:none;opacity:0;animation:pshIn 520ms linear forwards}
 @keyframes pshIn{0%{opacity:0}22%{opacity:.25}48%{opacity:1}82%{opacity:1}100%{opacity:.4}}
 .pleaf-next .pface.front .psh{background:linear-gradient(to left,transparent 55%,rgba(29,22,21,.12))}
 .pleaf-next .pface.back .psh{background:linear-gradient(to right,rgba(29,22,21,.16),transparent 45%)}
@@ -124,10 +124,10 @@ backface-visibility:hidden;-webkit-backface-visibility:hidden}
 @keyframes nbCastPrev{0%{opacity:0;transform:scaleX(.12)}40%{opacity:.10;transform:scaleX(.5)}
 78%{opacity:.42;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.04)}}
 /* vertical (mobile) flips — applied by notebook.js */
-.m-out-next{transform-origin:50% 0;animation:nbMOutNext .34s cubic-bezier(.55,.06,.68,.19) forwards;background:var(--page);z-index:6}
-.m-in-next{transform-origin:50% 100%;animation:nbMInNext .42s cubic-bezier(.22,.61,.36,1) both;background:var(--page);z-index:6}
-.m-out-prev{transform-origin:50% 100%;animation:nbMOutPrev .34s cubic-bezier(.55,.06,.68,.19) forwards;background:var(--page);z-index:6}
-.m-in-prev{transform-origin:50% 0;animation:nbMInPrev .42s cubic-bezier(.22,.61,.36,1) both;background:var(--page);z-index:6}
+.m-out-next{transform-origin:50% 0;animation:nbMOutNext .26s cubic-bezier(.55,.06,.68,.19) forwards;background:var(--page);z-index:6}
+.m-in-next{transform-origin:50% 100%;animation:nbMInNext .34s cubic-bezier(.22,.61,.36,1) both;background:var(--page);z-index:6}
+.m-out-prev{transform-origin:50% 100%;animation:nbMOutPrev .26s cubic-bezier(.55,.06,.68,.19) forwards;background:var(--page);z-index:6}
+.m-in-prev{transform-origin:50% 0;animation:nbMInPrev .34s cubic-bezier(.22,.61,.36,1) both;background:var(--page);z-index:6}
 /* mobile two-page book */
 .mbook{display:flex;flex-direction:column}
 .mpage{flex:1 1 0;min-height:0;overflow:hidden;position:relative}
@@ -140,10 +140,10 @@ backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .pg.can-prev{cursor:pointer}
 .pg.can-next{cursor:pointer}
 .flip-out-next .pg.R,.flip-in-next .pg.L,.flip-out-prev .pg.L,.flip-in-prev .pg.R{background:var(--page);z-index:6}
-.flip-out-next .pg.R{transform-origin:left center;animation:nbOutNext .38s cubic-bezier(.55,.06,.68,.19) forwards}
-.flip-out-prev .pg.L{transform-origin:right center;animation:nbOutPrev .38s cubic-bezier(.55,.06,.68,.19) forwards}
-.flip-in-next .pg.L{transform-origin:right center;animation:nbInNext .42s cubic-bezier(.22,.61,.36,1)}
-.flip-in-prev .pg.R{transform-origin:left center;animation:nbInPrev .42s cubic-bezier(.22,.61,.36,1)}
+.flip-out-next .pg.R{transform-origin:left center;animation:nbOutNext .3s cubic-bezier(.55,.06,.68,.19) forwards}
+.flip-out-prev .pg.L{transform-origin:right center;animation:nbOutPrev .3s cubic-bezier(.55,.06,.68,.19) forwards}
+.flip-in-next .pg.L{transform-origin:right center;animation:nbInNext .34s cubic-bezier(.22,.61,.36,1)}
+.flip-in-prev .pg.R{transform-origin:left center;animation:nbInPrev .34s cubic-bezier(.22,.61,.36,1)}
 @keyframes nbOutNext{from{transform:perspective(1800px) rotateY(0)}to{transform:perspective(1800px) rotateY(-88deg)}}
 @keyframes nbOutPrev{from{transform:perspective(1800px) rotateY(0)}to{transform:perspective(1800px) rotateY(88deg)}}
 @keyframes nbInNext{from{transform:perspective(1800px) rotateY(88deg)}to{transform:perspective(1800px) rotateY(0)}}

@@ -151,8 +151,8 @@ html[data-mode="night"] .pg{scrollbar-color:rgba(140,170,230,.35) transparent}
   radial-gradient(circle,rgba(150,215,220,.45) .9px,transparent 1.8px) 7px 19px/41px 37px;
  -webkit-mask:radial-gradient(46% 54% at 50% 50%,#000 34%,transparent 72%);
  mask:radial-gradient(46% 54% at 50% 50%,#000 34%,transparent 72%)}
-.nw-next{animation:nebSweepL 1.05s ease-in-out both}
-.nw-prev{animation:nebSweepR 1.05s ease-in-out both}
+.nw-next{animation:nebSweepL .8s ease-in-out both}
+.nw-prev{animation:nebSweepR .8s ease-in-out both}
 @keyframes nebSweepL{0%{opacity:0;transform:translateX(52%)}28%{opacity:1}72%{opacity:1}
  100%{opacity:0;transform:translateX(-52%)}}
 @keyframes nebSweepR{0%{opacity:0;transform:translateX(-52%)}28%{opacity:1}72%{opacity:1}
@@ -162,13 +162,13 @@ html[data-mode="night"] .leafouter.wash-old{background:radial-gradient(115% 115%
 .nwo-next,.nwo-prev,.nwi-next,.nwi-prev{-webkit-mask-size:300% 100%;mask-size:300% 100%;
  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;will-change:mask-position}
 .nwo-next{-webkit-mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);
- mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);animation:nightMaskF 1.05s ease-in-out both}
+ mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);animation:nightMaskF .8s ease-in-out both}
 .nwo-prev{-webkit-mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);
- mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);animation:nightMaskB 1.05s ease-in-out both}
+ mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);animation:nightMaskB .8s ease-in-out both}
 .nwi-next{-webkit-mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);
- mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);animation:nightMaskF 1.05s ease-in-out both}
+ mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);animation:nightMaskF .8s ease-in-out both}
 .nwi-prev{-webkit-mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);
- mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);animation:nightMaskB 1.05s ease-in-out both}
+ mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);animation:nightMaskB .8s ease-in-out both}
 @keyframes nightMaskF{from{-webkit-mask-position:0% 0;mask-position:0% 0}to{-webkit-mask-position:100% 0;mask-position:100% 0}}
 @keyframes nightMaskB{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:0% 0;mask-position:0% 0}}
 /* vertical variants for mobile: the cloud rises or falls */

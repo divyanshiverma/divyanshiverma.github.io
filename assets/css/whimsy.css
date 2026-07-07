@@ -201,3 +201,7 @@ button.wtool{font-size:13px}
 .wtool:focus-visible,.wchip:focus-visible,.wsizeopt:focus-visible,.wmitem:focus-visible,
 .wix:focus-visible,.wstar:focus-visible,.wback:focus-visible,.wparr:focus-visible,
 .wpeel:focus-visible,.wact:focus-visible,.wtrailtog:focus-visible{outline:2px dashed #B72025;outline-offset:2px}
+
+/* views arrive with a breath, not a blink */
+.wsecview,.wpaperview{animation:wvin .18s ease-out}
+@keyframes wvin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}

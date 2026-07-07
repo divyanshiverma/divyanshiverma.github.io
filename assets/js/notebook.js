@@ -242,11 +242,11 @@
   var lo=mkWashOld('wash-old '+(mobile?'v ':'')+(d==='next'?'nwo-next':'nwo-prev'),-(single?1:2)*k*unit);
   if(d==='next')k++;else k--;
   stickEnd=false;place();
-  setTimeout(function(){lo.remove();busy=false;},1020);
+  setTimeout(function(){lo.remove();busy=false;},830);
  }
  function deskFlip(d){
   var out=(d==='next');
-  var dur=720;
+  var dur=520;
   var frontCol=out?2*k+1:2*k;
   var backCol=out?2*k+2:2*k-1;
   var underCol=out?2*k+3:2*k-2;
@@ -273,8 +273,8 @@
    if(d==='next')k++;else k--;
    stickEnd=false;place();
    inEl.classList.add(d==='next'?'m-in-next':'m-in-prev');
-   setTimeout(function(){inEl.classList.remove('m-in-next','m-in-prev');busy=false;},430);
-  },335);
+   setTimeout(function(){inEl.classList.remove('m-in-next','m-in-prev');busy=false;},350);
+  },265);
  }
  function spaEligible(href){
   if(!sheet)return false;
@@ -336,7 +336,7 @@
   mkWash(d,spread.parentNode);
   var lo=mkWashOld('wash-old '+(mobile?'v ':'')+(d==='next'?'nwo-next':'nwo-prev'),-(single?1:2)*k*unit);
   applyChrome(pl);applyContent(d,pl);
-  setTimeout(function(){lo.remove();busy=false;},1020);
+  setTimeout(function(){lo.remove();busy=false;},830);
  }
  function spaMob(d,pl){
   var outEl=d==='next'?vpB:vpT;
@@ -347,8 +347,8 @@
    var inEl=d==='next'?vpT:vpB;
    var cls=d==='next'?'m-in-next':'m-in-prev';
    inEl.classList.add(cls);
-   setTimeout(function(){inEl.classList.remove(cls);busy=false;},450);
-  },335);
+   setTimeout(function(){inEl.classList.remove(cls);busy=false;},350);
+  },265);
  }
  function spaDesk(d,pl){
   var host=vp||spread;
@@ -359,7 +359,7 @@
   host.appendChild(tmp);
   var lastK=Math.max(0,Math.ceil(measureColsOf(tmp)/2)-1);
   var out=(d==='next');
-  var dur=720;
+  var dur=520;
   var frontCol=out?2*k+1:2*k;
   var backCol=out?0:2*lastK+1;
   var underCol=out?1:2*lastK;
@@ -412,11 +412,12 @@
    return;
   }
   var done=false;
-  var slow=setTimeout(function(){if(!done){done=true;fallbackLeave(d,href);}},1500);
-  fetch(abs).then(function(r){return r.text();}).then(function(txt){
+  var slow=setTimeout(function(){if(!done){done=true;fallbackLeave(d,href);}},900);
+  var ride=pfWait[abs]?pfWait[abs]:fetch(abs).then(function(r){return r.text();});
+  ride.then(function(txt){
    if(done)return;
    done=true;clearTimeout(slow);
-   if(!fromText(txt))fallbackLeave(d,href);
+   if(!txt||!fromText(txt))fallbackLeave(d,href);
   }).catch(function(){
    if(!done){done=true;clearTimeout(slow);fallbackLeave(d,href);}
   });
@@ -427,21 +428,21 @@
    mkWash(d,spread.parentNode);
    if(mobile)spread.classList.add('v');
    spread.classList.add(d==='next'?'nwo-next':'nwo-prev');
-   setTimeout(function(){location.href=href;},520);
+   setTimeout(function(){location.href=href;},420);
    return;
   }
   if(mobile){
    var el=spread.classList.contains('mbook')?(d==='next'?vpB:vpT):spread;
    el.classList.add(d==='next'?'m-out-next':'m-out-prev');
-   setTimeout(function(){location.href=href;},330);
+   setTimeout(function(){location.href=href;},290);
   }else if(sheet){
    mkPleaf(d,d==='next'?2*k+1:2*k,null,
-    d==='next'?'nbLeafOutNext':'nbLeafOutPrev',340,'cubic-bezier(.5,.05,.85,.4)');
+    d==='next'?'nbLeafOutNext':'nbLeafOutPrev',300,'cubic-bezier(.5,.05,.85,.4)');
    hideHalf(d==='next'?'R':'L');
-   setTimeout(function(){location.href=href;},330);
+   setTimeout(function(){location.href=href;},290);
   }else{
    spread.classList.add(d==='next'?'flip-out-next':'flip-out-prev');
-   setTimeout(function(){location.href=href;},365);
+   setTimeout(function(){location.href=href;},320);
   }
  }
  function go(d){
@@ -562,14 +563,15 @@
   place();
   sizeVine();
  }
- var pfDone={},pfText={};
+ var pfDone={},pfText={},pfWait={};
  function prefetch(href){
   if(!href||pfDone[href]||/^(https?:|mailto:|#|data:)/i.test(href))return;
   pfDone[href]=1;
   try{
    var abs=new URL(href,location.href).href;
-   fetch(abs).then(function(r){return r.ok?r.text():null;})
-    .then(function(t){if(t)pfText[abs]=t;}).catch(function(){});
+   pfWait[abs]=fetch(abs).then(function(r){return r.ok?r.text():null;})
+    .then(function(t){if(t)pfText[abs]=t;delete pfWait[abs];return t;})
+    .catch(function(){delete pfWait[abs];return null;});
   }catch(e){}
  }
  document.addEventListener('pointerover',function(e){

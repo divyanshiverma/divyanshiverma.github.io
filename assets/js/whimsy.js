@@ -825,6 +825,11 @@
   initTools(tools);
   initCanvas();
   restoreStickers(w);
+  /* warm the shelves: section pages fetch in the idle moments after the desk
+     builds, so opening one never waits on the network */
+  setTimeout(function(){
+   SECTIONS.forEach(function(sec){fetchDoc(sec.href);});
+  },600);
  }
 
  /* ---------- sections + pane ---------- */
@@ -941,6 +946,7 @@
   path.setAttribute('d',dd);
   lines.appendChild(path);
   cons.appendChild(lines);
+  setTimeout(function(){d.items.forEach(function(it){fetchDoc(it.href);});},300);
   d.items.forEach(function(it,i){
    var b=el('button','wstar'+((i%2)?' flip':''),cons);
    b.type='button';
