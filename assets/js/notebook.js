@@ -247,7 +247,7 @@
   lf.style.transformOrigin=(dir==='next'?'left':'right')+' center';
   lf.appendChild(mkFaceFrom('front',srcF,frontCol,box));
   lf.appendChild(mkFaceFrom('back',srcB,backCol,box));
-  lf.style.opacity='.001';
+  lf.style.opacity='.01';
   quietPsh(lf,true);
   spread.appendChild(lf);
   return lf;
@@ -275,7 +275,7 @@
   if(intra){
    var under=mkUnder(d==='next'?2*k+3:2*k-2,d==='next'?'R':'L');
    under.classList.add('warm');
-   under.style.opacity='.001';
+   under.style.opacity='.01';
    var lf=mkPleafQuiet(d,sheet,d==='next'?2*k+1:2*k,sheet,d==='next'?2*k+2:2*k-1,box);
    spread.classList.add('persp');
    return {kind:'intra',sig:warmSig(),lf:lf,under:under};
@@ -308,7 +308,7 @@
   var out=(d==='next');
   var under2=mkUnderFrom(tmp,out?1:2*lastK,out?'R':'L');
   under2.classList.add('warm');
-  under2.style.opacity='.001';
+  under2.style.opacity='.01';
   var lf2=mkPleafQuiet(d,sheet,out?2*k+1:2*k,tmp,out?0:2*lastK+1,box);
   spread.classList.add('persp');
   return {kind:'spa',sig:warmSig(),path:new URL(abs).pathname,lf:lf2,under:under2,tmp:tmp,lastK:lastK};
