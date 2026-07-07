@@ -228,7 +228,7 @@
    var w=warm[dd];
    if(!w)return;
    had=true;
-   ['lf','under','tmp'].forEach(function(kk){
+   ['lf','under','tmp','cast'].forEach(function(kk){
     if(w[kk]&&w[kk].parentNode)w[kk].parentNode.removeChild(w[kk]);
    });
    warm[dd]=null;
@@ -236,7 +236,22 @@
   if(had&&!busy&&spread)spread.classList.remove('persp');
  }
  function quietPsh(el,on){
-  [].slice.call(el.querySelectorAll('.psh')).forEach(function(s){s.style.animation=on?'none':'';});
+  [].slice.call(el.querySelectorAll('.psh')).forEach(function(s){
+   s.style.animation=on?'none':'';
+   if(on)s.style.willChange='opacity';
+  });
+ }
+ function mkCastQuiet(half){
+  var box=vpBox();
+  var c=document.createElement('div');
+  c.className='pcast warm pcast-'+(half==='L'?'next':'prev');
+  c.setAttribute('aria-hidden','true');
+  c.style.top=box.t+'px';c.style.height=box.h+'px';c.style.width=unit+'px';
+  c.style.left=(half==='R'?box.l+unit:box.l)+'px';
+  c.style.opacity='.01';
+  c.style.willChange='opacity';
+  spread.appendChild(c);
+  return c;
  }
  function mkPleafQuiet(dir,srcF,frontCol,srcB,backCol,box){
   var lf=document.createElement('div');
@@ -262,6 +277,11 @@
  }
  function activateWarm(w,anim,dur,ease){
   spread.classList.add('persp');
+  if(w.cast){
+   w.cast.classList.remove('warm');
+   w.cast.style.opacity='';
+   w.cast.style.animation=(anim.indexOf('Next')>-1?'nbCastNext':'nbCastPrev')+' '+dur+'ms linear forwards';
+  }
   w.under.classList.remove('warm');
   w.under.style.opacity='';
   w.lf.classList.remove('warm');
@@ -286,8 +306,9 @@
    under.classList.add('warm');
    under.style.opacity='.01';
    var lf=mkPleafQuiet(d,sheet,d==='next'?2*k+1:2*k,sheet,d==='next'?2*k+2:2*k-1,box);
+   var cast=mkCastQuiet(d==='next'?'L':'R');
    spread.classList.add('persp');
-   return {kind:'intra',sig:warmSig(),lf:lf,under:under};
+   return {kind:'intra',sig:warmSig(),lf:lf,under:under,cast:cast};
   }
   var href=d==='next'?nextHref:prevHref;
   if(!href||!spaEligible(href))return null;
@@ -319,8 +340,9 @@
   under2.classList.add('warm');
   under2.style.opacity='.01';
   var lf2=mkPleafQuiet(d,sheet,out?2*k+1:2*k,tmp,out?0:2*lastK+1,box);
+  var cast2=mkCastQuiet(out?'L':'R');
   spread.classList.add('persp');
-  return {kind:'spa',sig:warmSig(),path:new URL(abs).pathname,lf:lf2,under:under2,tmp:tmp,lastK:lastK};
+  return {kind:'spa',sig:warmSig(),path:new URL(abs).pathname,lf:lf2,under:under2,tmp:tmp,lastK:lastK,cast:cast2};
  }
  function scheduleWarm(){
   clearTimeout(warmT);
@@ -367,14 +389,15 @@
   var dur=520;
   var lf,under;
   var w=takeWarm(d,'intra');
+  var cast;
   if(w){
-   under=w.under;lf=w.lf;
+   under=w.under;lf=w.lf;cast=w.cast;
    activateWarm(w,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
   }else{
    under=mkUnder(out?2*k+3:2*k-2,out?'R':'L');
    lf=mkPleaf(d,out?2*k+1:2*k,out?2*k+2:2*k-1,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
+   cast=mkCast(out?'L':'R',out?'nbCastNext':'nbCastPrev',dur);
   }
-  var cast=mkCast(out?'L':'R',out?'nbCastNext':'nbCastPrev',dur);
   var done=false;
   function finish(){
    if(done)return;done=true;
@@ -479,8 +502,9 @@
   var dur=520;
   var tmp,lastK,under,lf;
   var w=takeWarm(d,'spa',pl.path);
+  var cast;
   if(w){
-   tmp=w.tmp;lastK=w.lastK;under=w.under;lf=w.lf;
+   tmp=w.tmp;lastK=w.lastK;under=w.under;lf=w.lf;cast=w.cast;
    activateWarm(w,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
   }else{
    tmp=sheet.cloneNode(false);
@@ -491,8 +515,8 @@
    lastK=Math.max(0,Math.ceil(measureColsOf(tmp)/2)-1);
    under=mkUnderFrom(tmp,out?1:2*lastK,out?'R':'L');
    lf=mkPleafFrom(d,sheet,out?2*k+1:2*k,tmp,out?0:2*lastK+1,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
+   cast=mkCast(out?'L':'R',out?'nbCastNext':'nbCastPrev',dur);
   }
-  var cast=mkCast(out?'L':'R',out?'nbCastNext':'nbCastPrev',dur);
   var fin=false;
   function finish(){
    if(fin)return;fin=true;
