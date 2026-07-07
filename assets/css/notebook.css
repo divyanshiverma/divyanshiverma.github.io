@@ -1,0 +1,318 @@
+:root{--paper:#FAFAFA;--page:#FFFDF7;--ink:#1D1615;--deep:#1A2421;--green:#2E8B57;
+--sage:#87AE73;--red:#B72025;--pink:#F16C95;--line:#E3E0D6;--soft:#767168;
+/* contrast inks: same hues as the palette above, darkened until text passes 4.5:1.
+   --green-ink is for green TEXT (prose links etc); the --tab-* fills sit under white tab labels.
+   Graphic greens (vine, tapes, .lead links) keep the original values. */
+--green-ink:#298551;--tab-sage:#5a8047;--tab-pink:#e61455;--tab-green:#298551;
+/* type scale — 6 steps + handwritten */
+--fs-xs:.6875rem;   /* 11px  badges, mode toggle */
+--fs-sm:.8125rem;   /* 13px  meta: crumb, table headers, skills, takeaway */
+--fs-md:.90625rem;  /* 14.5px UI: nav links, tabs, table body */
+--fs-base:1.03125rem; /* 16.5px body copy, sub-headings, brand */
+--fs-lg:1.3125rem;  /* 21px  section headings */
+--fs-xl:clamp(1.8rem,3.4vw,2.5rem); /* 28.8–40px page titles, responsive */
+--fs-hand:1rem;     /* 16px  all Satisfy handwritten notes */
+/* spacing scale */
+--sp-1:.25rem;  /* 4px */
+--sp-2:.5rem;   /* 8px */
+--sp-3:.8125rem;/* 13px paragraph rhythm */
+--sp-4:1.125rem;/* 18px */
+--sp-5:1.625rem;/* 26px */
+--sp-6:2.125rem;/* 34px */
+--pg-pad:3.625rem; /* 58px page margin */
+--spine:7.25rem}   /* 116px spine gap = 2 × page margin */
+/* night and whimsy restyle --green for their own palettes; text links follow it there */
+html[data-mode="night"],html[data-mode="whimsy"]{--green-ink:var(--green)}
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){:root{--fs-md:.8125rem;--fs-sm:.75rem}}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:'Work Sans',sans-serif;font-size:var(--fs-base);
+line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+a:focus-visible,.tab:focus-visible{outline:2px dashed var(--red);outline-offset:3px}
+.nav{position:sticky;top:0;z-index:40;background:rgba(250,250,250,.94);backdrop-filter:blur(6px);
+border-bottom:1.5px solid var(--deep)}
+.nav .in{max-width:76.25rem;margin:0 auto;padding:0 1.25rem;height:3.75rem;display:flex;align-items:center;gap:.875rem}
+.brand{display:flex;align-items:center;gap:.625rem;text-decoration:none}
+.brand b{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-base)}
+.nav .sp{flex:1}
+.nav .lnk{text-decoration:none;font-size:var(--fs-md);color:var(--soft);margin-right:var(--sp-2)}
+.nav .lnk:hover{color:var(--ink);text-decoration:underline}
+.mode{display:flex;border:1.5px solid var(--deep);border-radius:999px;overflow:visible;font-size:var(--fs-xs)}
+.mode span{padding:var(--sp-1) .75rem}
+/* invisible tap-area extender: the pill stays 26px tall but fingers get 44px */
+.mode span,.mode button{position:relative}
+.mode span::after,.mode button::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.mode .on{background:var(--deep);color:var(--paper);font-weight:600;border-radius:999px}
+.mode .off{color:var(--soft);cursor:not-allowed}
+/* desk */
+.desk{position:relative;margin:0 auto;padding:2.875rem 1.5rem 2.75rem;overflow:hidden;
+background-image:radial-gradient(circle,#EBE8DE 1px,transparent 1.2px);background-size:18px 18px;}
+.m{position:absolute;opacity:.55;pointer-events:none;z-index:0}
+.bookwrap{position:relative;z-index:2;max-width:70rem;margin:0 auto;perspective:2400px}
+.crumb{font-size:var(--fs-sm);color:var(--soft);margin:0 .375rem .625rem 0;text-align:right;min-height:1.5rem}
+/* the book */
+.spread{background:var(--page);border:1.5px solid var(--deep);border-radius:8px;position:relative;
+display:grid;grid-template-columns:1fr 1fr;height:55rem;
+box-shadow:
+ -3px 2px 0 -1px #efece2,-3px 2px 0 0 #cfc9b6,
+ -6px 2px 0 -1px #efece2,-6px 2px 0 0 #cfc9b6,
+ 3px 2px 0 -1px #efece2,3px 2px 0 0 #cfc9b6,
+ 6px 2px 0 -1px #efece2,6px 2px 0 0 #cfc9b6,
+ 9px 2px 0 -1px #efece2,9px 2px 0 0 #cfc9b6,
+ 12px 2px 0 -1px #efece2,12px 2px 0 0 #cfc9b6,
+ 15px 2px 0 -1px #efece2,15px 2px 0 0 #cfc9b6,
+ 18px 2px 0 -1px #efece2,18px 2px 0 0 #cfc9b6,
+ 0 30px 54px rgba(29,22,21,.14)}
+.vine{position:absolute;left:50%;transform:translateX(-50%);top:16px;bottom:16px;width:26px;
+background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%20150%27%20fill%3D%27none%27%20stroke%3D%27%2387AE73%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%3E%3Cpath%20d%3D%27M12%200%20q6%2020%200%2038%20q-6%2018%200%2038%20q6%2018%200%2038%20q-4%2014%200%2036%27/%3E%3Cpath%20d%3D%27M12%2022%20q-8%20-2%20-10%20-9%27/%3E%3Cpath%20d%3D%27M12%2052%20q8%20-2%2010%20-9%27/%3E%3Cpath%20d%3D%27M12%2084%20q-8%20-2%20-10%20-9%27/%3E%3Cpath%20d%3D%27M12%20116%20q8%20-2%2010%20-9%27/%3E%3Cellipse%20cx%3D%274%27%20cy%3D%2711%27%20rx%3D%273.4%27%20ry%3D%272%27%20transform%3D%27rotate%28-38%204%2011%29%27/%3E%3Cellipse%20cx%3D%2720%27%20cy%3D%2741%27%20rx%3D%273.4%27%20ry%3D%272%27%20transform%3D%27rotate%2838%2020%2041%29%27/%3E%3Cellipse%20cx%3D%274%27%20cy%3D%2773%27%20rx%3D%273.4%27%20ry%3D%272%27%20transform%3D%27rotate%28-38%204%2073%29%27/%3E%3Cellipse%20cx%3D%2720%27%20cy%3D%27105%27%20rx%3D%273.4%27%20ry%3D%272%27%20transform%3D%27rotate%2838%2020%20105%29%27/%3E%3C/svg%3E") center top/24px 150px repeat-y;opacity:.75;pointer-events:none}
+.pg{padding:var(--pg-pad);position:relative;min-width:0;display:flex;flex-direction:column;
+scrollbar-width:thin;scrollbar-color:#d8d3c4 transparent}
+.pg::-webkit-scrollbar{width:6px}
+.pg::-webkit-scrollbar-thumb{background:#d8d3c4;border-radius:3px}
+.ribbon{position:absolute;top:-8px;left:41.5%;width:26px;height:130px;background:var(--red);z-index:3;
+clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%)}
+/* page-turn click zones (hidden — flip handled by notebook.js on the pages themselves) */
+.zone{display:none}
+/* continuous page flow: one sheet, two columns (left page fills to the bottom, then right page) */
+.sheet{grid-column:1/-1;padding:var(--pg-pad);column-count:2;column-gap:var(--spine);column-fill:auto;overflow:hidden;position:relative;min-width:0}
+.sheet table.idx{break-inside:avoid}
+/* end-of-piece motif — fills an otherwise blank right/bottom page (shown by notebook.js) */
+.endmotif{display:none;break-before:column;height:96%;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-6);opacity:.8}
+/* handwritten page numbers (added by notebook.js) */
+.pgnum{position:absolute;bottom:var(--sp-4);font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand);z-index:4;pointer-events:none}
+.pgnum-l{left:var(--pg-pad)}
+.pgnum-r{right:var(--pg-pad)}
+.sheetvp{grid-column:1/-1;overflow:hidden;position:relative}
+.sheetvp .sheet{height:100%}
+.sheet .prose img,.sheet blockquote,.sheet .photo{break-inside:avoid}
+.sheet p.lead{break-inside:avoid} /* intro must not split mid-sentence across the fold */
+.sheet h1,.sheet h2,.sheet h3{break-after:avoid;break-inside:avoid} /* no heading alone at a page bottom, no heading split across the fold */
+/* turning leaf: ONE continuous sheet with a front and a back face, turning
+   under a single shared perspective so it reads as real paper, not blinds */
+.spread.persp{perspective:2600px;perspective-origin:50% 42%}
+.pleaf{position:absolute;z-index:8;transform-style:preserve-3d;pointer-events:none;will-change:transform}
+.pface{position:absolute;inset:0;overflow:hidden;background:var(--page);
+backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.pface.back{transform:rotateY(180deg)}
+.pface .sheet{position:absolute;top:0;left:0}
+.psh{position:absolute;inset:0;pointer-events:none;opacity:0;animation:pshIn 720ms linear forwards}
+@keyframes pshIn{0%{opacity:0}22%{opacity:.25}48%{opacity:1}82%{opacity:1}100%{opacity:.4}}
+.pleaf-next .pface.front .psh{background:linear-gradient(to left,transparent 55%,rgba(29,22,21,.12))}
+.pleaf-next .pface.back .psh{background:linear-gradient(to right,rgba(29,22,21,.16),transparent 45%)}
+.pleaf-prev .pface.front .psh{background:linear-gradient(to right,transparent 55%,rgba(29,22,21,.12))}
+.pleaf-prev .pface.back .psh{background:linear-gradient(to left,rgba(29,22,21,.16),transparent 45%)}
+.punder{position:absolute;overflow:hidden;background:var(--page);z-index:6;pointer-events:none}
+.punder .sheet{position:absolute;top:0;left:0}
+.pcast{position:absolute;z-index:7;pointer-events:none;opacity:0}
+.pcast-next{background:linear-gradient(to left,rgba(29,22,21,.34),rgba(29,22,21,0) 72%);transform-origin:right center}
+.pcast-prev{background:linear-gradient(to right,rgba(29,22,21,.34),rgba(29,22,21,0) 72%);transform-origin:left center}
+@keyframes nbLeafNext{0%{transform:rotateY(0) rotateX(0)}12%{transform:rotateY(-13deg) rotateX(.6deg)}
+32%{transform:rotateY(-55deg) rotateX(1.1deg)}55%{transform:rotateY(-110deg) rotateX(.5deg)}
+78%{transform:rotateY(-159deg) rotateX(-.5deg)}92%{transform:rotateY(-175.5deg) rotateX(-.2deg)}
+100%{transform:rotateY(-180deg) rotateX(0)}}
+@keyframes nbLeafPrev{0%{transform:rotateY(0) rotateX(0)}12%{transform:rotateY(13deg) rotateX(.6deg)}
+32%{transform:rotateY(55deg) rotateX(1.1deg)}55%{transform:rotateY(110deg) rotateX(.5deg)}
+78%{transform:rotateY(159deg) rotateX(-.5deg)}92%{transform:rotateY(175.5deg) rotateX(-.2deg)}
+100%{transform:rotateY(180deg) rotateX(0)}}
+@keyframes nbLeafOutNext{0%{transform:rotateY(0)}100%{transform:rotateY(-92deg)}}
+@keyframes nbLeafOutPrev{0%{transform:rotateY(0)}100%{transform:rotateY(92deg)}}
+@keyframes nbLeafInNext{0%{transform:rotateY(-92deg)}88%{transform:rotateY(-176deg)}100%{transform:rotateY(-180deg)}}
+@keyframes nbLeafInPrev{0%{transform:rotateY(92deg)}88%{transform:rotateY(176deg)}100%{transform:rotateY(180deg)}}
+@keyframes nbCastNext{0%{opacity:0;transform:scaleX(.12)}40%{opacity:.10;transform:scaleX(.5)}
+78%{opacity:.42;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.04)}}
+@keyframes nbCastPrev{0%{opacity:0;transform:scaleX(.12)}40%{opacity:.10;transform:scaleX(.5)}
+78%{opacity:.42;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.04)}}
+/* vertical (mobile) flips — applied by notebook.js */
+.m-out-next{transform-origin:50% 0;animation:nbMOutNext .34s cubic-bezier(.55,.06,.68,.19) forwards;background:var(--page);z-index:6}
+.m-in-next{transform-origin:50% 100%;animation:nbMInNext .42s cubic-bezier(.22,.61,.36,1) both;background:var(--page);z-index:6}
+.m-out-prev{transform-origin:50% 100%;animation:nbMOutPrev .34s cubic-bezier(.55,.06,.68,.19) forwards;background:var(--page);z-index:6}
+.m-in-prev{transform-origin:50% 0;animation:nbMInPrev .42s cubic-bezier(.22,.61,.36,1) both;background:var(--page);z-index:6}
+/* mobile two-page book */
+.mbook{display:flex;flex-direction:column}
+.mpage{flex:1 1 0;min-height:0;overflow:hidden;position:relative}
+.mpage .sheet{height:100%}
+.mhint{position:absolute;right:.875rem;font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand);pointer-events:none;z-index:4}
+.mhint-up{top:.625rem}
+.mhint-dn{bottom:.625rem}
+.pgind{white-space:nowrap}
+/* page flip */
+.pg.can-prev{cursor:pointer}
+.pg.can-next{cursor:pointer}
+.flip-out-next .pg.R,.flip-in-next .pg.L,.flip-out-prev .pg.L,.flip-in-prev .pg.R{background:var(--page);z-index:6}
+.flip-out-next .pg.R{transform-origin:left center;animation:nbOutNext .38s cubic-bezier(.55,.06,.68,.19) forwards}
+.flip-out-prev .pg.L{transform-origin:right center;animation:nbOutPrev .38s cubic-bezier(.55,.06,.68,.19) forwards}
+.flip-in-next .pg.L{transform-origin:right center;animation:nbInNext .42s cubic-bezier(.22,.61,.36,1)}
+.flip-in-prev .pg.R{transform-origin:left center;animation:nbInPrev .42s cubic-bezier(.22,.61,.36,1)}
+@keyframes nbOutNext{from{transform:perspective(1800px) rotateY(0)}to{transform:perspective(1800px) rotateY(-88deg)}}
+@keyframes nbOutPrev{from{transform:perspective(1800px) rotateY(0)}to{transform:perspective(1800px) rotateY(88deg)}}
+@keyframes nbInNext{from{transform:perspective(1800px) rotateY(88deg)}to{transform:perspective(1800px) rotateY(0)}}
+@keyframes nbInPrev{from{transform:perspective(1800px) rotateY(-88deg)}to{transform:perspective(1800px) rotateY(0)}}
+@keyframes nbMOutNext{0%{transform:perspective(1400px) rotateX(0) skewX(0)}45%{transform:perspective(1400px) rotateX(46deg) skewX(-5deg)}100%{transform:perspective(1400px) rotateX(88deg) skewX(0)}}
+@keyframes nbMInNext{0%{transform:perspective(1400px) rotateX(-88deg) skewX(0)}55%{transform:perspective(1400px) rotateX(-40deg) skewX(5deg)}100%{transform:perspective(1400px) rotateX(0) skewX(0)}}
+@keyframes nbMOutPrev{0%{transform:perspective(1400px) rotateX(0) skewX(0)}45%{transform:perspective(1400px) rotateX(-46deg) skewX(5deg)}100%{transform:perspective(1400px) rotateX(-88deg) skewX(0)}}
+@keyframes nbMInPrev{0%{transform:perspective(1400px) rotateX(88deg) skewX(0)}55%{transform:perspective(1400px) rotateX(40deg) skewX(-5deg)}100%{transform:perspective(1400px) rotateX(0) skewX(0)}}
+/* home tab — sticks out from the top edge of the book */
+.tab-home{position:absolute;top:1px;left:2.125rem;transform:translateY(-100%);z-index:5;
+display:inline-flex;align-items:center;padding:.4375rem 1.125rem .5625rem;background:var(--tab-sage);color:#fff;
+font-weight:600;font-size:var(--fs-md);letter-spacing:.02em;text-decoration:none;border-radius:9px 9px 0 0}
+/* hover/active shades: a translucent ink overlay DARKENS the fill under the white
+   label (brightness() lifted it and dropped the contrast below 4.5:1) */
+.tab-home:hover{background-image:linear-gradient(rgba(29,22,21,.08),rgba(29,22,21,.08))}
+/* tabs */
+.tabs{position:absolute;right:0;top:4rem;display:flex;flex-direction:column;gap:.875rem;z-index:5;
+transform:translateX(calc(100% - 2px))}
+.tab{position:relative;display:flex;align-items:center;padding:.5rem 1.25rem .5rem .875rem;color:#fff;font-weight:600;
+text-decoration:none;font-size:var(--fs-md);letter-spacing:.02em}
+/* the arrow shape is painted on ::before, so the clip-path cannot clip the tap area */
+.tab::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--tabfill,var(--deep));
+clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%)}
+/* invisible tap-area extender, same trick as the mode pill */
+.tab::after,.tab-home::after{content:"";position:absolute;left:0;right:0;top:50%;height:max(100%,44px);transform:translateY(-50%)}
+.tab.act::before{background-image:linear-gradient(rgba(29,22,21,.14),rgba(29,22,21,.14))}
+.tab:hover::before{background-image:linear-gradient(rgba(29,22,21,.08),rgba(29,22,21,.08))}
+.t-design{--tabfill:var(--tab-green)}.t-marketing{--tabfill:var(--red)}
+.t-blog{--tabfill:var(--tab-pink)}.t-about{--tabfill:var(--deep)}
+/* type */
+h1.big{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-xl);line-height:1.1;margin:0 0 .875rem}
+h2.sub{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-lg);margin:0 0 .75rem}
+.hand{font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand)}
+.lead{max-width:56ch;margin-bottom:.75rem}
+.center{text-align:center}
+/* photo */
+.photo{width:236px;transform:rotate(-2deg);background:#fff;border:1.5px solid var(--deep);
+padding:.625rem;box-shadow:4px 5px 0 rgba(29,22,21,.12);position:relative;margin:1.875rem auto 1.5rem}
+.photo .ph{height:216px;display:flex;align-items:center;justify-content:center;text-align:center;
+color:var(--soft);font-family:'Satisfy',cursive;font-size:var(--fs-hand);padding:.625rem;
+background:repeating-linear-gradient(45deg,#f0ede4 0 12px,#e9e5d8 12px 24px)}
+.photo img{width:100%;height:216px;object-fit:cover;display:block}
+.photo::before,.photo::after{content:'';position:absolute;width:86px;height:24px;background:rgba(135,174,115,.45);
+top:-12px;transform:rotate(-4deg);left:16px}
+.photo::after{left:auto;right:14px;transform:rotate(5deg)}
+/* index table */
+table.idx{width:100%;border-collapse:collapse;margin-top:var(--sp-2);font-size:var(--fs-md);background:#fff}
+.idx th{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-sm);letter-spacing:.02em}
+.idx th,.idx td{border:1px solid #CFCAB8;padding:.375rem .5625rem;text-align:left;vertical-align:top}
+.idx td.no,.idx th.no{width:3.2rem;text-align:center}
+.idx td.pn,.idx th.pn{width:4.4rem;text-align:center;color:var(--soft)}
+.idx td.sk{color:var(--soft);font-size:var(--fs-sm)}
+.idx a{text-decoration:none;font-weight:500}
+.idx a:hover{color:var(--green-ink);text-decoration:underline}
+.idx td.pn{font-family:'Work Sans',sans-serif;font-size:var(--fs-sm)}
+.idx a.go{font-family:'Work Sans',sans-serif;font-weight:400;font-size:var(--fs-sm);
+color:var(--green-ink);text-decoration:underline}
+/* prose */
+.prose h2{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-lg);color:var(--deep);margin:1.5rem 0 .625rem}
+.prose h3{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-base);margin:var(--sp-4) 0 var(--sp-2)}
+.prose p{margin:0 0 var(--sp-3)}
+.prose ul,.prose ol{margin:0 0 var(--sp-3) 1.25rem}
+.prose li{margin-bottom:.3125rem;overflow-wrap:anywhere}
+.prose img{max-width:100%;max-height:27.5rem;width:auto;height:auto;display:block;
+border:1px solid var(--line);border-radius:3px;background:#fff;padding:5px;margin:var(--sp-5) auto var(--sp-4)}
+.prose .cap{font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand);margin:-.5rem 0 1rem;text-align:center}
+.prose .subtitle{color:var(--soft);font-size:var(--fs-base);margin-bottom:.875rem}
+.prose blockquote{border-left:3px solid var(--red);padding:var(--sp-1) 0 var(--sp-1) .875rem;color:var(--soft);margin:0 0 var(--sp-3)}
+.prose a{color:var(--green-ink)}
+/* click-to-expand images — white polaroid mat, corner tapes (grid-stacked: no abs positioning, multicol-safe) */
+.zoomwrap{display:grid;width:fit-content;position:relative;margin:var(--sp-5) auto var(--sp-4);break-inside:avoid;cursor:zoom-in;
+background:#fff;border:1px solid var(--line);border-radius:3px;padding:.4375rem .4375rem 1.625rem;
+box-shadow:2px 3px 0 rgba(29,22,21,.08)}
+.zoomwrap>*{grid-area:1/1}
+.zoomwrap img{margin:0;border:none;padding:0;background:none;border-radius:0}
+.tape{width:58px;height:18px;background:rgba(135,174,115,.45);pointer-events:none;z-index:2}
+.tape-tl{justify-self:center;align-self:start;transform:translateY(-1.05rem) rotate(-4deg)}
+.tape-br{justify-self:center;align-self:end;transform:translateY(2.3rem) rotate(3deg)}
+.zoombadge{justify-self:end;align-self:end;transform:translateY(calc(100% + .3rem));background:none;color:var(--soft);
+font-family:'Satisfy',cursive;font-size:var(--fs-hand);letter-spacing:0;padding:0;border-radius:0;pointer-events:none;white-space:nowrap;line-height:1;z-index:1}
+.lightbox{position:fixed;inset:0;background:rgba(29,22,21,.86);display:none;align-items:center;justify-content:center;z-index:99;cursor:zoom-out;padding:1.25rem}
+.lightbox img{max-width:94vw;max-height:92vh;background:#fff;padding:6px;border-radius:3px}
+/* download-as-pdf line at the end of a piece */
+.pdfnote{font-family:'Satisfy',cursive;font-size:var(--fs-hand);text-align:center;margin:var(--sp-6) 0 0}
+.pdfnote a{color:var(--green-ink)}
+/* page nav */
+.pagenav{display:flex;justify-content:space-between;align-items:center;gap:.875rem;margin-top:var(--sp-6);
+border-top:1px solid #D8D3C4;padding-top:.875rem;font-size:var(--fs-md)}
+.pagenav a{color:var(--red);text-decoration:none}
+.pagenav a:hover{text-decoration:underline}
+.pagenav .mid{font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand)}
+.takeaway{margin-top:.75rem;font-size:var(--fs-sm);color:var(--soft)}
+.takeaway a{color:var(--green-ink)}
+.colophon{text-align:center;font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand);padding:var(--sp-4) 0 2.625rem}
+/* phones in landscape (short + coarse) read as mobile too, whatever their width */
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ .spread{grid-template-columns:1fr;height:auto;min-height:0;margin-top:2.875rem;border-radius:8px;
+  box-shadow:
+   0 -3px 0 -1px #efece2,0 -3px 0 0 #cfc9b6,
+   0 3px 0 -1px #efece2,0 3px 0 0 #cfc9b6,
+   0 6px 0 -1px #efece2,0 6px 0 0 #cfc9b6,
+   0 9px 0 -1px #efece2,0 9px 0 0 #cfc9b6,
+   0 18px 34px rgba(29,22,21,.14)}
+ .spread.mbook{height:48.75rem}
+ .vine{display:none}
+ .pg{padding:2.5rem 1.625rem 4.125rem;overflow:visible}
+ .pg.L{border-bottom:1.5px dashed var(--line)}
+ .tabs{position:absolute;transform:none;top:auto;bottom:100%;left:calc(17% + 1.125rem);right:.625rem;
+  flex-direction:row;align-items:stretch;gap:.375rem}
+ .tab-home{top:auto;bottom:100%;left:.625rem;transform:none;border-radius:9px 9px 0 0;
+  height:2.25rem;display:inline-flex;align-items:flex-end;justify-content:center;
+  width:17%;min-width:3rem;padding:0 .25rem .375rem;font-size:clamp(.72rem,3.2vw,var(--fs-md))}
+ .spread::before,.spread::after{display:none}
+ .tab{flex:1 1 0;min-width:0;justify-content:center;height:2.25rem;align-items:flex-end;
+  border-radius:0;padding:0 .25rem .375rem;
+  font-size:clamp(.72rem,3.2vw,var(--fs-md));white-space:nowrap}
+ .tab::before{clip-path:polygon(0 100%,0 11px,50% 0,100% 11px,100% 100%)}
+ /* fitScreen may shrink the book ~30%: oversize the tap strip so it still lands >=40px */
+ .tab::after,.tab-home::after{height:max(100%,60px)}
+ .tab.act{padding:0 .25rem .375rem}
+ .ribbon,.zone{display:none}
+ .desk{padding:1.625rem .75rem 1.875rem}
+ .m{display:none}
+ .nav .lnk.hidesm{display:none}
+ .mode span{padding:var(--sp-1) var(--sp-2)}
+ /* mobile page margins: 44 / 26 / 48 (spine gap stays 2 × side margin) */
+ .sheet{column-count:1;column-gap:3.25rem;padding:2.75rem 1.625rem 3rem}
+ /* compact index tables; notebook.js keeps splits within one two-page view */
+ .sheet table.idx{break-inside:auto}
+ .idx tr{break-inside:avoid}
+ .idx th,.idx td{padding:var(--sp-1) .375rem}
+ .idx td.pn,.idx th.pn{width:3.6rem}
+ /* images: fit to page, tap to expand */
+ .prose img{max-height:14rem}
+ .zoomwrap{margin:1.25rem auto .875rem}
+ .photo{width:180px;margin:var(--sp-2) auto .75rem}
+ .photo::after{display:none}
+ .photo .ph,.photo img{height:148px}
+ .pgnum{bottom:var(--sp-2)}
+ .pgnum-l{left:1rem}
+ .pgnum-r{right:auto;left:1rem}
+}
+/* very narrow phones: the mode pill was pushing past the 320px edge */
+@media(max-width:374px){
+ .nav .in{padding:0 .625rem;gap:.5rem}
+ .nav .mode span,.nav .mode button{padding:var(--sp-1) .4375rem}
+}
+/* print: linearise the notebook into a clean document */
+@media print{
+ .nav,.tabs,.tab-home,.crumb,.mhint,.pgnum,.zoombadge,.endmotif,.colophon,.m,.vine,.ribbon,.pdfnote,.takeaway,.colspacer,.leafouter,.mbot{display:none!important}
+ body{background:#fff}
+ .desk{padding:0;background:none;overflow:visible}
+ .bookwrap{max-width:none;perspective:none}
+ .spread,.spread.mbook{display:block;height:auto;box-shadow:none!important;border:none;border-radius:0}
+ .mpage,.sheetvp{overflow:visible}
+ .sheet{column-count:1!important;column-gap:0!important;height:auto!important;overflow:visible!important;transform:none!important;clip-path:none!important;padding:0}
+ .zoomwrap{break-inside:avoid;box-shadow:none}
+}
+
+/* nb-tip: "coming soon" bubble on the disabled mode buttons */
+.mode .off{position:relative}
+.mode .off:hover::after{content:attr(data-tip);position:absolute;left:50%;top:calc(100% + 9px);
+right:auto;height:auto; /* undo the tap-area strip while the bubble borrows this pseudo */
+transform:translateX(-50%);background:var(--deep);color:var(--paper);font-size:.68rem;
+font-family:'Work Sans',sans-serif;padding:3px 10px;border-radius:6px;white-space:nowrap;z-index:99}
+.mode .off:hover::before{content:"";position:absolute;left:50%;top:calc(100% - 1px);
+transform:translateX(-50%);border:5px solid transparent;border-bottom-color:var(--deep);z-index:99}
+
+/* fit-to-screen: while the book is scaled down, clear the desk around it */
+.bw-fit .desk{padding-top:.75rem;padding-bottom:.75rem}
+.bw-fit .colophon{padding:.375rem 0 .625rem}
+.bw-fit .m{display:none}

@@ -1,0 +1,399 @@
+/* night.css — the night sky. Its own place, not a dark recolour of the notebook. */
+
+/* mode toggle buttons (present in both modes; night.js builds them) */
+.mode button{font-family:inherit;font-size:var(--fs-xs);line-height:inherit;padding:var(--sp-1) .75rem;border-radius:999px;
+ background:none;border:0;color:var(--soft);cursor:pointer}
+.mode button[aria-pressed="true"]{background:var(--deep);color:var(--paper);font-weight:600}
+.mode button:focus-visible{outline:2px dashed var(--red);outline-offset:-2px}
+
+/* section crumb can carry a link back to its section (night.js adds it) */
+.crumb a{color:inherit;text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+
+/* ---- tokens ---- */
+html[data-mode="night"]{
+ --paper:#04050e;            /* deepest sky */
+ --page:#111b36;             /* solid panel tone, used by page-flip leaves */
+ --ink:#eef2ff;              /* star white */
+ --deep:#dfe8ff;             /* headings, pale starlight */
+ --green:#9fc0ff;            /* in-prose links, cool star blue */
+ --sage:#22304f;
+ --red:#E3554A;              /* the observer's lamp: tiny nav and link cues only */
+ --pink:#22304f;
+ --line:rgba(150,180,240,.22);
+ --soft:#8ea3c4;             /* muted blue, captions and hands */
+ color-scheme:dark;
+}
+
+/* ---- the sky itself ---- */
+/* the fill colour must equal the gradient's last stop: the fixed gradient
+   only spans one viewport, and on taller pages the fill carries the sky on.
+   a mismatched fill drew a hard seam across the mobile home page */
+html[data-mode="night"] body{
+ background:linear-gradient(180deg,#04050e 0%,#080e20 55%,#0c1330 100%) fixed #0c1330}
+html[data-mode="night"] .desk{background-image:none}
+html[data-mode="night"] .m{display:none}
+html[data-mode="night"] .desk,
+html[data-mode="night"] .colophon{position:relative;z-index:1}
+html[data-mode="night"] .colophon{color:#6f81a6;font-family:Georgia,serif;font-style:italic}
+
+/* fixed star field behind everything (night.js builds it) */
+.nightfx{display:none}
+html[data-mode="night"] .nightfx{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.nightfx svg{position:absolute;inset:-4%;width:108%;height:108%;will-change:transform}
+.nightfx .tw{animation:nightTw 4s ease-in-out infinite}
+.nightfx .neb{position:absolute;left:8%;bottom:6%;width:44%;height:36%;
+ background:radial-gradient(ellipse at center,rgba(70,110,170,.10),rgba(70,110,170,0) 66%);
+ animation:nightBreathe 16s ease-in-out infinite}
+.nightfx .shoot{position:absolute;width:140px;height:1.6px;border-radius:2px;opacity:0;
+ background:linear-gradient(90deg,rgba(255,255,255,0),rgba(214,230,255,.95));transform:rotate(27deg)}
+.nightfx .s1{top:12%;left:8%;animation:nightShoot 11s ease-in 3s infinite}
+.nightfx .s2{top:28%;left:52%;animation:nightShoot 17s ease-in 9.5s infinite}
+@keyframes nightTw{0%,100%{opacity:.18}50%{opacity:1}}
+@keyframes nightShoot{0%{opacity:0;transform:translate(0,0) rotate(27deg)}2.5%{opacity:1}
+ 12%{opacity:0;transform:translate(240px,122px) rotate(27deg)}100%{opacity:0;transform:translate(240px,122px) rotate(27deg)}}
+@keyframes nightBreathe{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* ---- chrome ---- */
+html[data-mode="night"] .nav{background:rgba(4,5,12,.72);backdrop-filter:blur(8px);
+ border-bottom:1px solid rgba(150,180,240,.14)}
+html[data-mode="night"] .brand b{color:#f2f6ff}
+html[data-mode="night"] .brand svg{border-radius:50%;padding:3px;width:34px;height:34px;
+ background:radial-gradient(closest-side,#ffffff 58%,rgba(255,255,255,.5) 76%,rgba(255,255,255,0) 100%);
+ filter:drop-shadow(0 0 10px rgba(220,235,255,.5))}
+html[data-mode="night"] .nav .lnk{color:#9fb2d6}
+html[data-mode="night"] .nav .lnk:hover{color:#fff}
+html[data-mode="night"] .mode{border-color:rgba(150,180,240,.35)}
+html[data-mode="night"] .mode .off{color:#55648a}
+html[data-mode="night"] .mode button{color:#8ea3c4}
+html[data-mode="night"] .mode button[aria-pressed="true"]{background:rgba(238,242,255,.16);color:#f5f8ff}
+
+/* ---- the ethereal notebook (projects and posts keep the working book) ---- */
+html[data-mode="night"] .spread{
+ border-color:transparent;border-radius:26px;
+ background:radial-gradient(115% 115% at 50% 38%,rgba(26,39,74,.60) 0%,rgba(17,27,54,.48) 55%,rgba(12,20,42,.20) 100%);
+ box-shadow:0 0 60px rgba(160,190,255,.12),0 0 170px rgba(120,160,255,.09),
+  inset 0 0 110px rgba(140,175,255,.05)!important}
+html[data-mode="night"] .vine{display:none}
+html[data-mode="night"] .ribbon{display:none}
+/* no day-notebook chrome at night: the page floats alone in the sky */
+html[data-mode="night"] .tabs,
+html[data-mode="night"] .tab-home{display:none}
+html[data-mode="night"] .crumb{color:#6f81a6}
+html[data-mode="night"] a:focus-visible,
+html[data-mode="night"] .tab:focus-visible,
+html[data-mode="night"] .mode button:focus-visible{outline-color:#E3554A}
+
+/* reading */
+html[data-mode="night"] h1.big,
+html[data-mode="night"] h2.sub{color:#f2f6ff;text-shadow:0 0 16px rgba(210,228,255,.30)}
+html[data-mode="night"] .prose h2,
+html[data-mode="night"] .prose h3{color:#dfe8ff;text-shadow:0 0 12px rgba(200,220,255,.22)}
+html[data-mode="night"] .hand,
+html[data-mode="night"] .prose .cap,
+html[data-mode="night"] .pgnum,
+html[data-mode="night"] .mhint,
+html[data-mode="night"] .pagenav .mid,
+html[data-mode="night"] .zoombadge{font-family:Georgia,serif;font-style:italic;color:#8ea3c4}
+html[data-mode="night"] .prose blockquote{border-left-color:rgba(227,85,74,.65);color:#aebdd8}
+html[data-mode="night"] table.idx{background:rgba(13,22,44,.6)}
+html[data-mode="night"] .idx th{color:#cdd8ff}
+html[data-mode="night"] .idx th,
+html[data-mode="night"] .idx td{border-color:rgba(140,170,230,.24)}
+html[data-mode="night"] .idx a:hover{color:#fff}
+html[data-mode="night"] .pagenav{border-top-color:rgba(140,170,230,.24)}
+html[data-mode="night"] .pagenav a{font-weight:500}
+html[data-mode="night"] .takeaway{color:#8ea3c4}
+
+/* images: framed by gentle stardust, with a soft backlight */
+html[data-mode="night"] .photo{background:rgba(18,29,56,.92);border-color:rgba(160,190,240,.55);
+ box-shadow:0 0 24px rgba(170,200,255,.22)}
+html[data-mode="night"] .photo .ph{background:repeating-linear-gradient(45deg,#0e1730 0 12px,#131f3e 12px 24px);
+ color:#8ea3c4;font-family:Georgia,serif;font-style:italic}
+html[data-mode="night"] .photo::before,
+html[data-mode="night"] .photo::after{background:rgba(199,214,242,.22)}
+html[data-mode="night"] .tape{display:none}
+html[data-mode="night"] .zoomwrap{background:none;border:none;box-shadow:none}
+html[data-mode="night"] .zoomwrap::before{content:"";position:absolute;pointer-events:none;opacity:.9;
+ top:-8px;left:-8px;right:-8px;bottom:calc(1.625rem - 8px);
+ background:
+  radial-gradient(circle,rgba(238,242,255,.95) 1px,transparent 1.9px) 0 0/17px 17px,
+  radial-gradient(circle,rgba(190,215,255,.55) .7px,transparent 1.4px) 8px 9px/23px 23px;
+ -webkit-mask:linear-gradient(#000 0 0),linear-gradient(#000 0 0) 15px 15px/calc(100% - 30px) calc(100% - 30px) no-repeat;
+ -webkit-mask-composite:xor;
+ mask:linear-gradient(#000 0 0),linear-gradient(#000 0 0) 15px 15px/calc(100% - 30px) calc(100% - 30px) no-repeat;
+ mask-composite:exclude}
+html[data-mode="night"] .zoomwrap img{box-shadow:0 0 26px rgba(160,195,255,.35)}
+html[data-mode="night"] .prose img{border-color:rgba(190,214,255,.4);background:#fff}
+html[data-mode="night"] .lightbox{background:rgba(3,4,10,.95)}
+/* the blank-page motif goes celestial: a crescent moon, fin., a shooting star */
+html[data-mode="night"] .endmotif{opacity:.8}
+html[data-mode="night"] .endmotif svg{display:none}
+html[data-mode="night"] .endmotif::before{content:"";width:64px;height:76px;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 82'%3E%3Cpath d='M50 14 A28 28 0 1 0 50 68 A22 22 0 1 1 50 14 Z' fill='none' stroke='%235b74a8' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M16 20 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z' fill='%23aebdd8'/%3E%3Ccircle cx='60' cy='22' r='1.7' fill='%23aebdd8'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-mode="night"] .endmotif::after{content:"";width:90px;height:70px;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 70'%3E%3Cpath d='M8 60 Q40 46 72 20' fill='none' stroke='%235b74a8' stroke-width='1.6' stroke-linecap='round' stroke-dasharray='1 7'/%3E%3Cpath d='M74 18 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4 z' fill='%23cfe0ff'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-mode="night"] .pg.L{border-bottom-color:rgba(140,170,230,.24)}
+html[data-mode="night"] .pg{scrollbar-color:rgba(140,170,230,.35) transparent}
+
+/* the nebula wash: a stardust cloud whose front carries content out and in */
+.nebwash{position:absolute;inset:-12% -28%;z-index:8;pointer-events:none;opacity:0}
+.nebwash::before{content:"";position:absolute;inset:0;filter:blur(20px);
+ background:
+  radial-gradient(42% 60% at 48% 40%,rgba(96,140,200,.28),rgba(96,140,200,0) 70%),
+  radial-gradient(36% 50% at 38% 62%,rgba(168,110,150,.22),rgba(168,110,150,0) 70%),
+  radial-gradient(30% 44% at 62% 50%,rgba(96,170,180,.20),rgba(96,170,180,0) 70%),
+  radial-gradient(24% 34% at 55% 34%,rgba(205,220,255,.14),rgba(205,220,255,0) 70%)}
+.nebwash::after{content:"";position:absolute;inset:8% 16%;
+ background:
+  radial-gradient(circle,rgba(205,225,255,.55) 1px,transparent 2px) 0 0/26px 22px,
+  radial-gradient(circle,rgba(255,205,185,.4) .8px,transparent 1.6px) 13px 9px/31px 27px,
+  radial-gradient(circle,rgba(150,215,220,.45) .9px,transparent 1.8px) 7px 19px/41px 37px;
+ -webkit-mask:radial-gradient(46% 54% at 50% 50%,#000 34%,transparent 72%);
+ mask:radial-gradient(46% 54% at 50% 50%,#000 34%,transparent 72%)}
+.nw-next{animation:nebSweepL 1.05s ease-in-out both}
+.nw-prev{animation:nebSweepR 1.05s ease-in-out both}
+@keyframes nebSweepL{0%{opacity:0;transform:translateX(52%)}28%{opacity:1}72%{opacity:1}
+ 100%{opacity:0;transform:translateX(-52%)}}
+@keyframes nebSweepR{0%{opacity:0;transform:translateX(-52%)}28%{opacity:1}72%{opacity:1}
+ 100%{opacity:0;transform:translateX(52%)}}
+/* masked wipes, synced with the cloud front (notebook.js applies these) */
+html[data-mode="night"] .leafouter.wash-old{background:radial-gradient(115% 115% at 50% 38%,#182444 0%,#111b36 55%,#0b1228 100%)}
+.nwo-next,.nwo-prev,.nwi-next,.nwi-prev{-webkit-mask-size:300% 100%;mask-size:300% 100%;
+ -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;will-change:mask-position}
+.nwo-next{-webkit-mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);
+ mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);animation:nightMaskF 1.05s ease-in-out both}
+.nwo-prev{-webkit-mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);
+ mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);animation:nightMaskB 1.05s ease-in-out both}
+.nwi-next{-webkit-mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);
+ mask-image:linear-gradient(100deg,rgba(0,0,0,0) 45%,#000 55%);animation:nightMaskF 1.05s ease-in-out both}
+.nwi-prev{-webkit-mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);
+ mask-image:linear-gradient(100deg,#000 45%,rgba(0,0,0,0) 55%);animation:nightMaskB 1.05s ease-in-out both}
+@keyframes nightMaskF{from{-webkit-mask-position:0% 0;mask-position:0% 0}to{-webkit-mask-position:100% 0;mask-position:100% 0}}
+@keyframes nightMaskB{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:0% 0;mask-position:0% 0}}
+/* vertical variants for mobile: the cloud rises or falls */
+.nebwash.v.nw-next{animation-name:nebSweepU}
+.nebwash.v.nw-prev{animation-name:nebSweepD}
+@keyframes nebSweepU{0%{opacity:0;transform:translateY(52%)}28%{opacity:1}72%{opacity:1}
+ 100%{opacity:0;transform:translateY(-52%)}}
+@keyframes nebSweepD{0%{opacity:0;transform:translateY(-52%)}28%{opacity:1}72%{opacity:1}
+ 100%{opacity:0;transform:translateY(52%)}}
+.v.nwo-next,.v.nwo-prev,.v.nwi-next,.v.nwi-prev{-webkit-mask-size:100% 300%;mask-size:100% 300%}
+.v.nwo-next{-webkit-mask-image:linear-gradient(170deg,#000 45%,rgba(0,0,0,0) 55%);
+ mask-image:linear-gradient(170deg,#000 45%,rgba(0,0,0,0) 55%);animation-name:nightMaskFV}
+.v.nwo-prev{-webkit-mask-image:linear-gradient(170deg,rgba(0,0,0,0) 45%,#000 55%);
+ mask-image:linear-gradient(170deg,rgba(0,0,0,0) 45%,#000 55%);animation-name:nightMaskBV}
+.v.nwi-next{-webkit-mask-image:linear-gradient(170deg,rgba(0,0,0,0) 45%,#000 55%);
+ mask-image:linear-gradient(170deg,rgba(0,0,0,0) 45%,#000 55%);animation-name:nightMaskFV}
+.v.nwi-prev{-webkit-mask-image:linear-gradient(170deg,#000 45%,rgba(0,0,0,0) 55%);
+ mask-image:linear-gradient(170deg,#000 45%,rgba(0,0,0,0) 55%);animation-name:nightMaskBV}
+@keyframes nightMaskFV{from{-webkit-mask-position:0 0%;mask-position:0 0%}to{-webkit-mask-position:0 100%;mask-position:0 100%}}
+@keyframes nightMaskBV{from{-webkit-mask-position:0 100%;mask-position:0 100%}to{-webkit-mask-position:0 0%;mask-position:0 0%}}
+
+/* mobile night: one whole page per screen, same page size, no dividing line */
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ html[data-mode="night"] .spread.nbook{height:48.75rem}
+ html[data-mode="night"] .spread.nbook .pgnum{font-family:Georgia,serif;font-style:italic}
+ html[data-mode="night"] .pg.L{border-bottom:none}
+}
+
+/* five stars top left: section switching, on sections and their pieces */
+.starnav{display:none}
+html[data-mode="night"] .starnav{display:flex;gap:1.375rem;position:relative;z-index:5;
+ max-width:76rem;margin:-1.25rem auto 1.25rem;padding:0 .25rem}
+.starnav a{display:inline-flex;align-items:center;gap:.4375rem;font-family:Georgia,serif;font-style:italic;
+ font-size:.9375rem;color:#8298bf;text-decoration:none;padding:.125rem 0}
+.starnav a svg{fill:#8298bf;filter:drop-shadow(0 0 3px rgba(200,220,255,.45));flex:none}
+.starnav a:hover,.starnav a:focus-visible{color:#eef2ff}
+.starnav a:hover svg,.starnav a:focus-visible svg{fill:#eef2ff}
+.starnav a.act{color:#eef2ff;text-shadow:0 0 10px rgba(210,230,255,.5)}
+.starnav a.act svg{fill:#fff;filter:drop-shadow(0 0 5px rgba(230,242,255,.9))}
+
+/* zooming into and out of the sky (home ↔ section) */
+.zoom-in-leave{animation:skyZoomIn .48s ease-in both}
+.zoom-out-leave{animation:skyZoomOut .48s ease-in both}
+.zoom-in-enter{animation:skyZoomInEnter .65s ease-out both}
+.zoom-out-enter{animation:skyZoomOutEnter .65s ease-out both}
+@keyframes skyZoomIn{to{transform:scale(1.7);opacity:0}}
+@keyframes skyZoomOut{to{transform:scale(.78);opacity:0}}
+@keyframes skyZoomInEnter{from{transform:scale(.82);opacity:0}}
+@keyframes skyZoomOutEnter{from{transform:scale(1.2);opacity:0}}
+
+/* ---- sky pages (home, sections, about; night.js builds them) ---- */
+.sky{display:none}
+html[data-mode="night"] .sky{display:block;position:relative;z-index:2;max-width:76rem;margin:0 auto}
+html[data-mode="night"] body.has-sky .bookwrap,
+html[data-mode="night"] body.has-sky .crumb{display:none}
+.sky svg.chart{width:100%;height:auto;display:block;will-change:transform}
+.sky a{text-decoration:none}
+.sky a:focus-visible{outline:2px dashed #E3554A;outline-offset:4px}
+.sky .tw{animation:nightTw 4.5s ease-in-out infinite}
+
+/* constellations */
+.sky .cline{stroke:#cdd8ff;fill:none;opacity:.3;transition:opacity .3s ease}
+.sky a:hover .cline,.sky a:focus-visible .cline,
+.sky g.hoverable:hover .cline{opacity:.85;animation:nightDraw .9s ease both}
+@keyframes nightDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.sky .star{fill:#eef2ff;filter:drop-shadow(0 0 2.5px rgba(230,240,255,.8))}
+.sky a:hover .star,.sky a:focus-visible .star{filter:drop-shadow(0 0 5px rgba(240,246,255,1))}
+.sky .glint{stroke:#eef2ff;opacity:.6}
+.sky .cname{font-family:Georgia,serif;font-style:italic;fill:#8298bf;letter-spacing:.03em}
+.sky .csub{font-family:Georgia,serif;font-style:italic;fill:#6f81a6}
+.sky a:hover .cname,.sky a:focus-visible .cname{fill:#f2f6ff}
+.sky .slabel{font-family:Georgia,serif;fill:#d6e2f5}
+.sky a:hover .slabel,.sky a:focus-visible .slabel{fill:#fff}
+.sky .stitle{font-family:'Fraunces',serif;font-weight:600;fill:#f2f6ff}
+
+/* home intro: centred block, photo left, words right */
+.sky-intro{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;
+ gap:2rem;padding:2.5rem 1rem 0;flex-wrap:wrap}
+.sky-intro .txt{min-width:0;max-width:34rem}
+.sky-intro h1{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-xl);line-height:1.1;
+ color:#f2f6ff;margin:0 0 .75rem;text-shadow:0 0 18px rgba(215,232,255,.35)}
+.sky-intro .sky-photo{flex:none;margin:0;width:10.5rem}
+.sky-intro .sky-photo .ph,.sky-intro .sky-photo img{height:10.5rem}
+.sky-intro p{color:#dbe4f8;max-width:52ch;margin:0 0 .625rem;font-size:var(--fs-base);
+ text-shadow:0 0 12px rgba(190,215,255,.18)}
+.sky-photo{flex:none;width:8.25rem;padding:.375rem;background:rgba(18,29,56,.92);
+ border:1px solid rgba(160,190,240,.55);box-shadow:0 0 26px rgba(170,200,255,.22);transform:rotate(-2deg)}
+.sky-photo .ph{height:8.25rem;display:flex;align-items:center;justify-content:center;text-align:center;
+ padding:.5rem;color:#8ea3c4;font-family:Georgia,serif;font-style:italic;font-size:.8125rem;
+ background:repeating-linear-gradient(45deg,#0e1730 0 12px,#131f3e 12px 24px)}
+.sky-photo img{width:100%;height:8.25rem;object-fit:cover;display:block}
+
+/* section: text left, index right, the constellation as the sky behind */
+html[data-mode="night"] .sky.sky-section{display:grid;grid-template-columns:1.05fr .95fr;gap:3.5rem;
+ align-items:start;padding:3.25rem 2.5rem 4.5rem;min-height:36rem}
+.sky-section .chartbg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.sky-section .chartbg svg{width:100%;height:100%;display:block}
+.sky-section .chartbg .cline{opacity:.22}
+.sky-section .chartbg .slabel{opacity:.5}
+.sky-section .lede{position:relative;z-index:1}
+.sky-section h1{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-xl);color:#f2f6ff;
+ margin:0 0 .375rem;text-shadow:0 0 18px rgba(215,232,255,.35)}
+.sky-section .ssub{font-family:Georgia,serif;font-style:italic;color:#8ea3c4;margin:0 0 1.25rem}
+.sky p.story{color:#e2e9fa;max-width:52ch;margin:0 0 .8125rem;text-shadow:0 0 12px rgba(190,215,255,.2)}
+
+/* the quiet glowing column of links */
+.sky-col{position:relative;z-index:1;padding-top:4.25rem}
+.sky-col .colhand{font-family:Georgia,serif;font-style:italic;color:#8ea3c4;margin:0 0 .625rem}
+.sky-col a.citem{display:flex;align-items:center;gap:.625rem;padding:.375rem 0;
+ font-family:Georgia,serif;font-size:1.0625rem;color:#d6e2f5;text-shadow:0 0 12px rgba(190,215,255,.28)}
+.sky-col a.citem::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;
+ background:#eef2ff;box-shadow:0 0 7px rgba(235,243,255,.95)}
+.sky-col a.citem:hover,.sky-col a.citem:focus-visible{color:#fff;text-shadow:0 0 14px rgba(230,240,255,.6)}
+.sky-chart{position:relative;z-index:1;min-width:0}
+.sky-chart svg.chart{width:100%;height:auto;display:block;overflow:visible}
+.sky-chart .colhand{font-family:Georgia,serif;font-style:italic;color:#8ea3c4;margin:0 0 .25rem;text-align:right}
+.sky-chart .starlabel{fill:#cdd8ff;font-family:Georgia,serif;font-style:italic;font-size:15px;
+paint-order:stroke;stroke:rgba(4,5,14,.75);stroke-width:3px}
+.sky-chart a{cursor:pointer;text-decoration:none}
+.sky-chart a:hover .starlabel,.sky-chart a:focus-visible .starlabel{fill:#fff}
+.sky-chart a:hover .star{filter:drop-shadow(0 0 7px rgba(230,240,255,.95))}
+.sky-chart-m{display:none}
+.sky-chart-m .listhand{font-family:Georgia,serif;font-style:italic;color:#8ea3c4;margin:.25rem 0 .375rem}
+.sky-chart-m svg{width:100%;height:auto;display:block;overflow:visible}
+.sky-chart-m .starlabel{fill:#cdd8ff;font-family:Georgia,serif;font-style:italic;font-size:17px;
+paint-order:stroke;stroke:rgba(4,5,14,.75);stroke-width:3px}
+.sky-chart-m .pgs{fill:#8ea3c4;font-size:14px}
+.sky-back{position:absolute;right:.5rem;top:.25rem;z-index:2}
+.sky-back a{font-family:Georgia,serif;font-style:italic;color:#8ea3c4}
+.sky-back a:hover{color:#fff}
+
+/* about: portrait and story in the sky */
+.sky-about{display:grid;grid-template-columns:16rem 1fr;gap:3.25rem;padding:3.25rem 2rem 2.5rem;
+ max-width:62rem;margin:0 auto}
+.sky-about .portrait{position:relative;justify-self:center}
+.sky-about .portrait::before{content:"";position:absolute;inset:-4.5rem;pointer-events:none;
+ background:radial-gradient(ellipse at center,rgba(223,232,255,.16),rgba(223,232,255,0) 68%)}
+.sky-about .sky-photo{width:14rem;transform:rotate(-1.5deg)}
+.sky-about .sky-photo .ph,.sky-about .sky-photo img{height:15rem}
+.sky-about h1{font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-xl);color:#f2f6ff;
+ margin:0 0 .875rem;text-shadow:0 0 18px rgba(215,232,255,.35)}
+.sky-about p.story{max-width:58ch}
+.sky-about .details{margin:1.375rem 0 0;border-top:1px solid rgba(140,170,230,.22);padding-top:1rem;
+ display:grid;grid-template-columns:auto 1fr;gap:.3125rem 1.5rem;font-size:var(--fs-md)}
+.sky-about .details .k{color:#6f81a6}
+.sky-about .details .v{color:#b9c8e8}
+.sky-about .details a{color:#E3554A;text-decoration:underline;text-underline-offset:3px}
+.sky-about .details a:hover{color:#fff}
+.sky-about .note{font-family:Georgia,serif;font-style:italic;color:#6f81a6;margin-top:1.375rem}
+
+/* mobile: the sky becomes a vertical scroll */
+.sky-list{display:none}
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ html[data-mode="night"] .sky-intro{padding:.75rem .125rem .5rem}
+ html[data-mode="night"] .sky.sky-section{grid-template-columns:1fr 1fr;gap:2rem;padding:2rem 1.25rem 3rem}
+}
+/* narrow screens: the section sky becomes a vertical scroll */
+@media(max-width:680px){
+ /* the star nav stays on phones, just tighter */
+ html[data-mode="night"] .starnav{display:flex;flex-wrap:wrap;gap:.5rem 1rem;margin:-.25rem 0 .875rem;padding:0 .125rem}
+ html[data-mode="night"] .starnav a{font-size:.8125rem;gap:.3125rem}
+ html[data-mode="night"] .starnav a svg{width:11px;height:11px}
+ html[data-mode="night"] .sky:not(.home-sky) svg.chart,
+ html[data-mode="night"] .sky-chart,
+ html[data-mode="night"] .sky-col{display:none}
+ html[data-mode="night"] .sky-back{position:static;text-align:right;padding:.375rem .125rem .125rem}
+ html[data-mode="night"] .sky.sky-section{display:block;padding:.75rem .125rem .5rem;min-height:0}
+ html[data-mode="night"] .sky:not(.home-sky) .sky-list{display:none}
+ html[data-mode="night"] .sky-chart-m{display:block;padding:.25rem 0 1.75rem}
+}
+/* phones: the home sky becomes a vertical scroll of constellation links */
+@media(max-width:640px){
+ html[data-mode="night"] .home-sky svg.chart{display:none}
+ html[data-mode="night"] .home-sky .sky-list{display:flex;flex-direction:column;gap:2.75rem;padding:1.5rem .75rem 3.5rem}
+ html[data-mode="night"] .home-sky .sky-intro{flex-direction:column;align-items:center;text-align:center}
+ /* the four sections sit ON the sky as constellations, not in a list */
+ html[data-mode="night"] .home-sky .sky-list a.item{flex-direction:column;align-items:center;gap:.375rem;
+  background:none;border:0;padding:0;width:64%;text-align:center}
+ html[data-mode="night"] .home-sky .sky-list a.item:nth-child(odd){align-self:flex-start}
+ html[data-mode="night"] .home-sky .sky-list a.item:nth-child(even){align-self:flex-end}
+ html[data-mode="night"] .home-sky .sky-list a.item .g svg{width:8.5rem;height:auto;
+  filter:drop-shadow(0 0 6px rgba(180,205,255,.28))}
+ html[data-mode="night"] .home-sky .sky-list a.item .t{text-align:center}
+ html[data-mode="night"] .home-sky .sky-list a.item .t b{text-shadow:0 0 12px rgba(190,215,255,.45)}
+}
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ .sky-list .mini{margin:0 0 .375rem}
+ .sky-list .mini svg{width:100%;height:auto;display:block;border-radius:12px}
+ .sky-list a.item{display:flex;align-items:center;gap:1.125rem;background:none;border:0;
+  border-bottom:1px solid rgba(150,180,240,.14);border-radius:0;padding:.75rem .25rem;color:#eef2ff;min-height:44px}
+ .sky-list a.item:hover .t b,.sky-list a.item:focus-visible .t b{text-shadow:0 0 14px rgba(230,240,255,.7)}
+ .sky-list .g{flex:none;display:flex}
+ .sky-list .t{flex:1;min-width:0}
+ .sky-list .t b{display:block;font-family:'Fraunces',serif;font-weight:600;font-size:var(--fs-base)}
+ .sky-list .t small{color:#8ea3c4;font-size:var(--fs-sm);font-family:Georgia,serif;font-style:italic}
+ .sky-list .listhand{font-family:Georgia,serif;font-style:italic;color:#8ea3c4;margin:.25rem 0 .125rem}
+ html[data-mode="night"] .sky-about{grid-template-columns:1fr;gap:1.75rem;padding:1.5rem 1.5rem 2rem;max-width:30rem}
+ html[data-mode="night"] .vine{display:none!important}
+}
+
+/* everything eases off */
+
+/* night never prints dark */
+@media print{
+ html[data-mode="night"]{--paper:#FAFAFA;--page:#FFFDF7;--ink:#1D1615;--deep:#1A2421;--green:#2E8B57;
+  --sage:#87AE73;--red:#B72025;--pink:#F16C95;--line:#E3E0D6;--soft:#8a857b}
+ html[data-mode="night"] body{background:#fff}
+ .sky,.nightfx{display:none!important}
+ html[data-mode="night"] body.has-sky .bookwrap{display:block}
+}
+
+/* base shell for the wash-old overlay (lived in notebook.css before the leaf rewrite) */
+.leafouter{position:absolute;inset:0;background:var(--page);z-index:7;pointer-events:none;overflow:visible}
+.leafouter .sheet{height:100%;overflow:visible}
+
+/* the sky pages never flash the notebook while the sky is being built */
+html[data-mode="night"] body.pg-home .bookwrap,
+html[data-mode="night"] body.pg-section .bookwrap,
+html[data-mode="night"] body.pg-about .bookwrap{visibility:hidden}
+
+/* night mobile readability: slightly larger reading text */
+@media(max-width:680px),(max-height:520px) and (pointer:coarse){
+ html[data-mode="night"] .pg{font-size:1.07em;line-height:1.66}
+ html[data-mode="night"] .sky-section .story{font-size:1.05em}
+ html[data-mode="night"] .sky-list .t small{font-size:.8125rem}
+ html[data-mode="night"] .starnav a{font-size:.875rem}
+ html[data-mode="night"] .sky-intro p{font-size:.9375rem}
+}
