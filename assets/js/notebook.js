@@ -70,6 +70,7 @@
    var base=location.href.split('#')[0];
    history.replaceState(null,'',k>0?base+'#p'+(k+1):base);
   }catch(e){}
+  scheduleWarm();
  }
  function hideHalf(side){
   var W=sheet.clientWidth,cut=2*k*unit+W/2;
@@ -215,6 +216,109 @@
   spread.appendChild(c);
   return c;
  }
+ /* pre-warmed leaves: the expensive full-sheet clones are built in idle
+    moments and parked invisibly, so a click only has to start the animation.
+    each warm leaf remembers exactly the layout it was built for (generation,
+    page, zoom, box); if anything moved, it is thrown away and rebuilt. */
+ var warm={next:null,prev:null},warmT=null,warmGen=0;
+ function warmSig(){return warmGen+'|'+k+'|'+(unit|0)+'|'+mobile+'|'+isNight()+'|'+(vpBox().h|0);}
+ function dropWarm(){
+  ['next','prev'].forEach(function(dd){
+   var w=warm[dd];
+   if(!w)return;
+   ['lf','under','tmp'].forEach(function(kk){
+    if(w[kk]&&w[kk].parentNode)w[kk].parentNode.removeChild(w[kk]);
+   });
+   warm[dd]=null;
+  });
+ }
+ function quietPsh(el,on){
+  [].slice.call(el.querySelectorAll('.psh')).forEach(function(s){s.style.animation=on?'none':'';});
+ }
+ function mkPleafQuiet(dir,srcF,frontCol,srcB,backCol,box){
+  var lf=document.createElement('div');
+  lf.className='pleaf warm pleaf-'+dir;
+  lf.setAttribute('aria-hidden','true');
+  lf.style.top=box.t+'px';lf.style.height=box.h+'px';lf.style.width=unit+'px';
+  lf.style.left=(dir==='next'?box.l+unit:box.l)+'px';
+  lf.style.transformOrigin=(dir==='next'?'left':'right')+' center';
+  lf.appendChild(mkFaceFrom('front',srcF,frontCol,box));
+  lf.appendChild(mkFaceFrom('back',srcB,backCol,box));
+  lf.style.opacity='.001';
+  quietPsh(lf,true);
+  spread.appendChild(lf);
+  return lf;
+ }
+ function activateWarm(w,anim,dur,ease){
+  spread.classList.add('persp');
+  w.under.classList.remove('warm');
+  w.under.style.visibility='';
+  w.lf.classList.remove('warm');
+  quietPsh(w.lf,false);
+  w.lf.style.opacity='';
+  w.lf.style.animation=anim+' '+dur+'ms '+ease+' forwards';
+ }
+ function takeWarm(d,kind,path){
+  var w=warm[d];
+  if(!w)return null;
+  if(w.kind!==kind||w.sig!==warmSig()||(path&&w.path!==path)){dropWarm();return null;}
+  warm[d]=null;
+  return w;
+ }
+ function buildWarm(d){
+  if(mobile||isNight()||!sheet||!spread)return null;
+  var box=vpBox();
+  var intra=(d==='next'?k<nSpreads-1:k>0);
+  if(intra){
+   var under=mkUnder(d==='next'?2*k+3:2*k-2,d==='next'?'R':'L');
+   under.classList.add('warm');
+   under.style.visibility='hidden';
+   var lf=mkPleafQuiet(d,sheet,d==='next'?2*k+1:2*k,sheet,d==='next'?2*k+2:2*k-1,box);
+   return {kind:'intra',sig:warmSig(),lf:lf,under:under};
+  }
+  var href=d==='next'?nextHref:prevHref;
+  if(!href||!spaEligible(href))return null;
+  var abs;
+  try{abs=new URL(href,location.href).href;}catch(e){return null;}
+  var txt=pfText[abs];
+  if(!txt)return null;
+  var doc=new DOMParser().parseFromString(txt,'text/html');
+  var ns=doc.querySelector('.spread');
+  var nsh=ns&&ns.querySelector('.sheet');
+  if(!nsh)return null;
+  var tmp=sheet.cloneNode(false);
+  tmp.classList.add('warm');
+  tmp.innerHTML=nsh.innerHTML;
+  /* the clone lives on THIS page but belongs to the next one: relative image
+     paths must resolve against their own page or they 404 across folders */
+  [].slice.call(tmp.querySelectorAll('img[src]')).forEach(function(im){
+   try{im.src=new URL(im.getAttribute('src'),abs).href;}catch(e){}
+  });
+  [].slice.call(tmp.querySelectorAll('a[href]')).forEach(function(a){
+   try{a.href=new URL(a.getAttribute('href'),abs).href;}catch(e){}
+  });
+  tmp.style.position='absolute';tmp.style.top='0';tmp.style.left='0';
+  tmp.style.visibility='hidden';tmp.style.transform='none';
+  (vp||spread).appendChild(tmp);
+  var lastK=Math.max(0,Math.ceil(measureColsOf(tmp)/2)-1);
+  var out=(d==='next');
+  var under2=mkUnderFrom(tmp,out?1:2*lastK,out?'R':'L');
+  under2.classList.add('warm');
+  under2.style.visibility='hidden';
+  var lf2=mkPleafQuiet(d,sheet,out?2*k+1:2*k,tmp,out?0:2*lastK+1,box);
+  return {kind:'spa',sig:warmSig(),path:new URL(abs).pathname,lf:lf2,under:under2,tmp:tmp,lastK:lastK};
+ }
+ function scheduleWarm(){
+  clearTimeout(warmT);
+  warmT=setTimeout(function(){
+   if(busy||document.hidden)return;
+   dropWarm();
+   if(mobile||isNight())return;
+   if(document.documentElement.getAttribute('data-mode')==='whimsy')return;
+   warm.next=buildWarm('next');
+   warm.prev=buildWarm('prev');
+  },180);
+ }
  /* night mode: a stardust nebula wash instead of page flips */
  function isNight(){return document.documentElement.getAttribute('data-mode')==='night';}
  function mkWashOld(cls,offset){
@@ -247,12 +351,16 @@
  function deskFlip(d){
   var out=(d==='next');
   var dur=520;
-  var frontCol=out?2*k+1:2*k;
-  var backCol=out?2*k+2:2*k-1;
-  var underCol=out?2*k+3:2*k-2;
-  var under=mkUnder(underCol,out?'R':'L');
+  var lf,under;
+  var w=takeWarm(d,'intra');
+  if(w){
+   under=w.under;lf=w.lf;
+   activateWarm(w,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
+  }else{
+   under=mkUnder(out?2*k+3:2*k-2,out?'R':'L');
+   lf=mkPleaf(d,out?2*k+1:2*k,out?2*k+2:2*k-1,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
+  }
   var cast=mkCast(out?'L':'R',out?'nbCastNext':'nbCastPrev',dur);
-  var lf=mkPleaf(d,frontCol,backCol,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
   var done=false;
   function finish(){
    if(done)return;done=true;
@@ -316,6 +424,7 @@
   try{window.dispatchEvent(new Event('nb:navigated'));}catch(e){}
  }
  function applyContent(d,pl){
+  warmGen++;dropWarm();
   sheet.innerHTML=pl.sheetHTML;
   wrapImages();
   if(sheetB){sheetB.innerHTML=sheet.innerHTML;muteClone(sheetB);}
@@ -352,20 +461,24 @@
  }
  function spaDesk(d,pl){
   var host=vp||spread;
-  var tmp=sheet.cloneNode(false);
-  tmp.innerHTML=pl.sheetHTML;
-  tmp.style.position='absolute';tmp.style.top='0';tmp.style.left='0';
-  tmp.style.visibility='hidden';tmp.style.transform='none';
-  host.appendChild(tmp);
-  var lastK=Math.max(0,Math.ceil(measureColsOf(tmp)/2)-1);
   var out=(d==='next');
   var dur=520;
-  var frontCol=out?2*k+1:2*k;
-  var backCol=out?0:2*lastK+1;
-  var underCol=out?1:2*lastK;
-  var under=mkUnderFrom(tmp,underCol,out?'R':'L');
+  var tmp,lastK,under,lf;
+  var w=takeWarm(d,'spa',pl.path);
+  if(w){
+   tmp=w.tmp;lastK=w.lastK;under=w.under;lf=w.lf;
+   activateWarm(w,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
+  }else{
+   tmp=sheet.cloneNode(false);
+   tmp.innerHTML=pl.sheetHTML;
+   tmp.style.position='absolute';tmp.style.top='0';tmp.style.left='0';
+   tmp.style.visibility='hidden';tmp.style.transform='none';
+   host.appendChild(tmp);
+   lastK=Math.max(0,Math.ceil(measureColsOf(tmp)/2)-1);
+   under=mkUnderFrom(tmp,out?1:2*lastK,out?'R':'L');
+   lf=mkPleafFrom(d,sheet,out?2*k+1:2*k,tmp,out?0:2*lastK+1,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
+  }
   var cast=mkCast(out?'L':'R',out?'nbCastNext':'nbCastPrev',dur);
-  var lf=mkPleafFrom(d,sheet,frontCol,tmp,backCol,out?'nbLeafNext':'nbLeafPrev',dur,'linear');
   var fin=false;
   function finish(){
    if(fin)return;fin=true;
@@ -570,7 +683,7 @@
   try{
    var abs=new URL(href,location.href).href;
    pfWait[abs]=fetch(abs).then(function(r){return r.ok?r.text():null;})
-    .then(function(t){if(t)pfText[abs]=t;delete pfWait[abs];return t;})
+    .then(function(t){if(t){pfText[abs]=t;scheduleWarm();}delete pfWait[abs];return t;})
     .catch(function(){delete pfWait[abs];return null;});
   }catch(e){}
  }
