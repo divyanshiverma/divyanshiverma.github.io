@@ -249,7 +249,15 @@
   lf.appendChild(mkFaceFrom('back',srcB,backCol,box));
   lf.style.opacity='.01';
   quietPsh(lf,true);
+  /* both faces must meet the compositor before the click: show the front for a
+     frame, then rest angled so the back face is the painted one */
+  lf.style.transform='rotateY(0.01deg)';
   spread.appendChild(lf);
+  requestAnimationFrame(function(){
+   requestAnimationFrame(function(){
+    if(lf.parentNode&&lf.classList.contains('warm'))lf.style.transform='rotateY(178deg)';
+   });
+  });
   return lf;
  }
  function activateWarm(w,anim,dur,ease){
@@ -259,6 +267,7 @@
   w.lf.classList.remove('warm');
   quietPsh(w.lf,false);
   w.lf.style.opacity='';
+  w.lf.style.transform='';
   w.lf.style.animation=anim+' '+dur+'ms '+ease+' forwards';
  }
  function takeWarm(d,kind,path){
