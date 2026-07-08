@@ -115,7 +115,7 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 .wview .wcontent table{font-size:.78rem}
 .wview .wcontent .endmotif,.wview .wcontent .pagenav{display:none}
 .wtray{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.wtray .wstick{cursor:grab;display:inline-flex;touch-action:none}
+.wtray .wstick{cursor:grab;display:inline-flex;touch-action:pan-x}
 .wtray .wstick svg{width:auto;height:26px}
 .wplaced{position:absolute;z-index:5;display:inline-flex;cursor:pointer}
 .wplaced.dragging{pointer-events:none}
@@ -169,17 +169,23 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
  .windex,.windexhand{display:none}
  .wtray{flex-wrap:nowrap;overflow-x:auto;gap:12px;padding-bottom:4px}
  .wtray .wstick svg{height:24px}
- /* reading = a full-screen sheet under the nav, one honest scroll */
+ /* reading = a full-screen sheet under the nav, one honest scroll.
+    the menu row rides pinned above it, so every section (and home) stays
+    one tap away while reading */
  .wdesk.reading .wcanvhold{display:none}
- .wdesk.reading .wview{position:fixed;top:3.75rem;left:0;right:0;bottom:0;z-index:70;
-  height:auto;display:flex;padding:9px}
+ .wdesk.reading .wmenu{position:fixed;top:3.75rem;left:0;right:0;z-index:72;
+  border-bottom:1.5px solid #1D1615}
+ .wdesk.reading .wview{position:fixed;top:calc(3.75rem + 2.55rem);left:0;right:0;bottom:0;
+  z-index:70;height:auto;display:flex;padding:9px}
  body.wreading{overflow:hidden}
+ html[data-mode="whimsy"] body.wreading .wtrailtog{display:none}
  .wsecview{flex-direction:column;overflow-y:auto}
  .wcons{min-height:17rem;flex:none}
  .wstar{max-width:72%}
  .wpaper{padding:12px 12px 46px}
- /* the way home floats in thumb reach, above the sheet */
- html[data-mode="whimsy"] .wdesk.reading .wback{position:fixed;right:12px;bottom:56px;z-index:75}
+ /* the way home floats top right, clear of the page-turn arrows */
+ html[data-mode="whimsy"] .wdesk.reading .wback{position:fixed;right:10px;bottom:auto;
+  top:calc(3.75rem + 2.55rem + 8px);z-index:75}
 }
 /* trail on/off, floats under the nav on the right, whimsy only */
 .wtrailtog{display:none}

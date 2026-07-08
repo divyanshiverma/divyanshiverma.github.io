@@ -1119,7 +1119,30 @@
   });
  }
  function startDrag(ev,svg,idx){
+  /* touch: a sideways swipe browses the tray (native pan-x); pulling UP is
+     what peels a sticker. mouse drags immediately, as always. */
+  if(ev.pointerType==='touch'){
+   var sx=ev.clientX,sy=ev.clientY,began=false;
+   function probe(e2){
+    var dx=e2.clientX-sx,dy=e2.clientY-sy;
+    if(!began&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){
+     began=true;unprobe();beginDrag(e2,svg,idx);
+    }else if(!began&&Math.abs(dx)>14)unprobe();
+   }
+   function unprobe(){
+    window.removeEventListener('pointermove',probe);
+    window.removeEventListener('pointerup',unprobe);
+    window.removeEventListener('pointercancel',unprobe);
+   }
+   window.addEventListener('pointermove',probe,{passive:true});
+   window.addEventListener('pointerup',unprobe);
+   window.addEventListener('pointercancel',unprobe);
+   return;
+  }
   ev.preventDefault();
+  beginDrag(ev,svg,idx);
+ }
+ function beginDrag(ev,svg,idx){
   var w=document.querySelector('.wdesk');
   var wr=w.getBoundingClientRect();
   var rot=Math.random()*20-10;
