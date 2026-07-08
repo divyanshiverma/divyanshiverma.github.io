@@ -94,6 +94,16 @@ clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%)}
 .pleaf{position:absolute;z-index:8;transform-style:preserve-3d;pointer-events:none;will-change:transform}
 .pface{position:absolute;inset:0;overflow:hidden;background:var(--page);
 backface-visibility:hidden;-webkit-backface-visibility:hidden}
+/* the page keeps its rounded outer corners while it turns */
+.pleaf-next .pface.front,.pleaf-prev .pface.back,.punder.pu-r{border-radius:0 8px 8px 0}
+.pleaf-next .pface.back,.pleaf-prev .pface.front,.punder.pu-l{border-radius:8px 0 0 8px}
+.punder{overflow:hidden}
+html[data-mode="night"] .pleaf-next .pface.front,html[data-mode="night"] .pleaf-prev .pface.back,
+html[data-mode="night"] .punder.pu-r{border-radius:0 26px 26px 0}
+html[data-mode="night"] .pleaf-next .pface.back,html[data-mode="night"] .pleaf-prev .pface.front,
+html[data-mode="night"] .punder.pu-l{border-radius:26px 0 0 26px}
+.leafouter{border-radius:8px;overflow:hidden}
+html[data-mode="night"] .leafouter{border-radius:26px}
 .pface.back{transform:rotateY(180deg)}
 .pface .sheet{position:absolute;top:0;left:0}
 .psh{position:absolute;inset:0;pointer-events:none;opacity:0;animation:pshIn 520ms linear forwards}

@@ -16,6 +16,19 @@
    location.href=(/\/(project|post)\//.test(location.pathname)?'../':'')+'index.html';
    return;
   }
+  /* night is its own world: entering it from any page starts at its first
+     page (the home sky); switching back to day walks you back to the page
+     you left the daylight on (Div's brother's call, Jul 8) */
+  if(m==='night'&&!home){
+   try{sessionStorage.setItem('dvDayBack',location.pathname);}catch(e){}
+   location.href=(/\/(project|post)\//.test(location.pathname)?'../':'')+'index.html';
+   return;
+  }
+  if(m==='day'&&home){
+   var back=null;
+   try{back=sessionStorage.getItem('dvDayBack');sessionStorage.removeItem('dvDayBack');}catch(e){}
+   if(back&&back!==location.pathname){location.href=back;return;}
+  }
   if(window.matchMedia('(max-width:940px),(max-height:520px) and (pointer:coarse)').matches){location.reload();return;}
   if(m==='day')root.removeAttribute('data-mode');
   else root.setAttribute('data-mode',m);
@@ -391,6 +404,13 @@
    var p=pts[j],x=cx+p.x,y=cy+p.y;
    var a=el('a',{href:it.href},svg);
    a.setAttribute('aria-label',it.label+(it.pages?', '+it.pages:''));
+   if(!reduced.matches){
+    a.addEventListener('click',function(e){
+     if(current()!=='night')return;
+     e.preventDefault();
+     zoomLeave(null,it.href,'in');
+    });
+   }
    el('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:'26',fill:'none','pointer-events':'all'},a);
    starDot(a,x.toFixed(1),y.toFixed(1),j===0?3.6:2.3+p.r*1.2,j===0);
    var nm=it.label.length>34?it.label.slice(0,32)+'\u2026':it.label;
@@ -435,6 +455,13 @@
    var p=mpts[j],x=mcx+p.x,y=mcy+p.y;
    var a=el('a',{href:it.href},msvg);
    a.setAttribute('aria-label',it.label+(it.pages?', '+it.pages:''));
+   if(!reduced.matches){
+    a.addEventListener('click',function(e){
+     if(current()!=='night')return;
+     e.preventDefault();
+     zoomLeave(null,it.href,'in');
+    });
+   }
    el('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:'36',fill:'none','pointer-events':'all'},a);
    starDot(a,x.toFixed(1),y.toFixed(1),j===0?3.8:2.5+p.r*1.2,j===0);
    var nm=it.label.length>26?it.label.slice(0,24)+'\u2026':it.label;

@@ -210,6 +210,7 @@ html[data-mode="night"] .starnav{display:flex;gap:1.375rem;position:relative;z-i
 .starnav a.act svg{fill:#fff;filter:drop-shadow(0 0 5px rgba(230,242,255,.9))}
 
 /* zooming into and out of the sky (home ↔ section) */
+.zoom-in-leave,.zoom-out-leave,.zoom-in-enter,.zoom-out-enter{will-change:transform,opacity}
 .zoom-in-leave{animation:skyZoomIn .48s ease-in both}
 .zoom-out-leave{animation:skyZoomOut .48s ease-in both}
 .zoom-in-enter{animation:skyZoomInEnter .65s ease-out both}

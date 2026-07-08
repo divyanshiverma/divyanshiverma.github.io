@@ -42,7 +42,7 @@
   tcv=document.createElement('canvas');
   tcv.className='wtrailcv';
   tcv.setAttribute('aria-hidden','true');
-  tcv.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:60;filter:'+TINT;
+  tcv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;filter:'+TINT;
   document.body.appendChild(tcv);
   sizeTrailCv();
   window.addEventListener('resize',sizeTrailCv);

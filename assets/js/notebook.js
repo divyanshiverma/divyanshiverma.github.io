@@ -93,6 +93,7 @@
   var skyEl=document.querySelector('.sky');
   if(skyEl)skyEl.style.zoom='';
   if(document.documentElement.getAttribute('data-mode')==='whimsy'&&document.body.classList.contains('has-whimsy'))return;
+  if(mobile&&single&&!isNight())return;
   /* landscape phones: fitting would make the book unreadably small; scroll instead */
   if(window.innerHeight<520)return;
   if(document.body.classList.contains('has-sky')&&isNight()){
@@ -167,10 +168,21 @@
   return c;
  }
  function sheetClone(col,box){return sheetCloneFrom(sheet,col,box);}
- function mkFaceFrom(which,src,col,box){
+ function vineStrip(parent,side){
+  /* half the spine vine, clipped at the face edge, so the middle pattern does
+     not vanish from the folding side mid-turn */
+  var v=document.createElement('div');
+  v.className='vine pvine';
+  v.style.cssText='position:absolute;top:16px;bottom:16px;left:auto;right:auto;transform:none;'+
+   (side==='L'?'left:-13px;':'right:-13px;');
+  parent.appendChild(v);
+  return v;
+ }
+ function mkFaceFrom(which,src,col,box,spine){
   var f=document.createElement('div');
   f.className='pface '+which;
   if(col!=null)f.appendChild(sheetCloneFrom(src,col,box));
+  if(spine)vineStrip(f,spine);
   var sh=document.createElement('div');sh.className='psh';f.appendChild(sh);
   return f;
  }
@@ -183,8 +195,8 @@
   lf.style.top=box.t+'px';lf.style.height=box.h+'px';lf.style.width=unit+'px';
   lf.style.left=(dir==='next'?box.l+unit:box.l)+'px';
   lf.style.transformOrigin=(dir==='next'?'left':'right')+' center';
-  lf.appendChild(mkFaceFrom('front',srcF,frontCol,box));
-  lf.appendChild(mkFaceFrom('back',srcB,backCol,box));
+  lf.appendChild(mkFaceFrom('front',srcF,frontCol,box,dir==='next'?'L':'R'));
+  lf.appendChild(mkFaceFrom('back',srcB,backCol,box,dir==='next'?'R':'L'));
   lf.style.animation=anim+' '+dur+'ms '+ease+' forwards';
   spread.classList.add('persp');
   spread.appendChild(lf);
@@ -196,11 +208,12 @@
  function mkUnderFrom(src,col,half){
   var box=vpBox();
   var o=document.createElement('div');
-  o.className='punder';
+  o.className='punder '+(half==='R'?'pu-r':'pu-l');
   o.setAttribute('aria-hidden','true');
   o.style.top=box.t+'px';o.style.height=box.h+'px';o.style.width=unit+'px';
   o.style.left=(half==='R'?box.l+unit:box.l)+'px';
   o.appendChild(sheetCloneFrom(src,col,box));
+  vineStrip(o,half==='R'?'L':'R');
   spread.appendChild(o);
   return o;
  }
@@ -260,8 +273,8 @@
   lf.style.top=box.t+'px';lf.style.height=box.h+'px';lf.style.width=unit+'px';
   lf.style.left=(dir==='next'?box.l+unit:box.l)+'px';
   lf.style.transformOrigin=(dir==='next'?'left':'right')+' center';
-  lf.appendChild(mkFaceFrom('front',srcF,frontCol,box));
-  lf.appendChild(mkFaceFrom('back',srcB,backCol,box));
+  lf.appendChild(mkFaceFrom('front',srcF,frontCol,box,dir==='next'?'L':'R'));
+  lf.appendChild(mkFaceFrom('back',srcB,backCol,box,dir==='next'?'R':'L'));
   lf.style.opacity='.01';
   quietPsh(lf,true);
   /* both faces must meet the compositor before the click: show the front for a
@@ -744,7 +757,7 @@
   if(orderIdx<0)orderIdx=0;
   isPiece=ORDER[orderIdx].indexOf('/')>-1;
   if(sheet)wrapImages();
-  single=isNight()&&mobile;
+  single=mobile&&(isNight()||bn==='index.html');
   if(sheet){single?buildSingle():mobile?buildMobile():buildDesk();}
   measure();
   fixTables();
