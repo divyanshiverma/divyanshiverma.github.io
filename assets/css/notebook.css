@@ -250,6 +250,9 @@ border-top:1px solid #D8D3C4;padding-top:.875rem;font-size:var(--fs-md)}
 .colophon{text-align:center;font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand);padding:var(--sp-4) 0 2.625rem}
 /* phones in landscape (short + coarse) read as mobile too, whatever their width */
 @media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ /* the single-page phone home flows as one column: the desktop column break
+    before the index would shove it into an invisible overflow column */
+ body.pg-home .sheet h2.sub{break-before:auto!important}
  .spread{grid-template-columns:1fr;height:auto;min-height:0;margin-top:2.875rem;border-radius:8px;
   box-shadow:
    0 -3px 0 -1px #efece2,0 -3px 0 0 #cfc9b6,
