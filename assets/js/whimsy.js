@@ -875,6 +875,7 @@
    });
   });
   desk.insertBefore(w,bw);
+  doodleOffsets();
   /* the trail can be hushed: little pill under the nav (Div's ask, Jul 7) */
   var tog=el('button','wtrailtog',document.body);
   tog.type='button';
@@ -951,6 +952,18 @@
   });
  }
  /* ---------- the views: sections and pages open INSIDE the canvas frame ---------- */
+ var DOODLE_OFF={};
+ function doodleOffsets(){
+  var counts={},run=0;
+  document.querySelectorAll('table.idx tbody tr').forEach(function(tr){
+   var a=tr.querySelector('td a'),sk=tr.querySelector('td.sk');
+   if(a&&sk)counts[a.textContent.trim()]=parseInt(sk.textContent,10)||0;
+  });
+  SECTIONS.forEach(function(s){
+   DOODLE_OFF[s.name]=run%DOODLES.length;
+   run+=counts[s.name]||0;
+  });
+ }
  function updateChrome(){
   var v=state.view;
   if(backBtn)backBtn.style.display=v?'':'none';
@@ -971,13 +984,13 @@
     drew in MS Paint. house, sun, moon, hills, river, v-birds, tree; the list
     cycles if a section has more pages than that (Div's call, Jul 9). */
  var DOODLES=[
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.5 L12 4.5 L20.5 11.5" stroke="#B72025"/><path d="M6 10.6 V19 H18 V10.6 M10.8 19 V14.2 H13.6 V19" stroke="#1A2421"/></svg>',
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" stroke="#F4A300"/><path d="M12 3.2v2.6M12 18.2v2.6M3.2 12h2.6M18.2 12h2.6M5.7 5.7l1.9 1.9M16.4 16.4l1.9 1.9M18.3 5.7l-1.9 1.9M7.6 16.4l-1.9 1.9" stroke="#F4A300"/></svg>',
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M14.5 3.6 A8.6 8.6 0 1 0 14.5 20.4 A6.7 6.7 0 1 1 14.5 3.6 Z" stroke="#F4A300"/></svg>',
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M1.8 19 Q7 10.5 12.2 19" stroke="#87AE73"/><path d="M9.4 19 Q15.4 8.6 22.2 19" stroke="#2E8B57"/></svg>',
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 9.5 q3 -2.6 6 0 q3 2.6 6 0 q3 -2.6 6.5 0 M2.5 15 q3 -2.6 6 0 q3 2.6 6 0 q3 -2.6 6.5 0" stroke="#8ea3c4"/></svg>',
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M3.5 12.5 q2.9 -3.8 5.8 0 M12.6 8.5 q2.9 -3.8 5.8 0 M8.5 17 q2.6 -3.4 5.2 0" stroke="#1D1615"/></svg>',
-  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6 a5.6 5.6 0 0 1 4.9 8.3 a4.4 4.4 0 0 1 -4.4 4 a4.6 4.6 0 0 1 -5.4 -4 a5.6 5.6 0 0 1 4.9 -8.3 Z" stroke="#2E8B57"/><path d="M12 15.9 V20.4 M12 18 q-2.2 -.7 -3 -2" stroke="#1A2421"/></svg>'];
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.6 12.6 Q8.1 8.4 13.2 4.7 Q17.6 8.1 22.6 12.2" stroke="#B72025" stroke-width="2.4"/><path d="M4.6 13.4 Q8.7 9.6 13 6.2 Q17 9.4 21.4 12.8" stroke="#B72025" stroke-width="1.1" opacity=".4"/><path d="M6.3 11.8 Q6.6 16 6.1 20.7 Q13 21.4 19.8 20.5 Q19.3 16 19.7 11.9" stroke="#1A2421" stroke-width="2.2"/><path d="M11.4 20.9 Q11.7 17.9 11.3 15.7 Q13.4 15.2 15.1 15.8 Q14.8 18.3 15.2 20.7" stroke="#1A2421" stroke-width="1.9"/></svg>',
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M13.2 8.7 Q17.7 8.5 17.4 13.2 Q17.1 17.6 12.8 17.4 Q8.7 17.2 8.9 12.9 Q9.1 9 13.6 8.9" stroke="#F4A300" stroke-width="2.3"/><path d="M13 9.6 Q16.7 9.6 16.5 13.1 Q16.3 16.5 12.9 16.4" stroke="#F4A300" stroke-width="1" opacity=".45"/><path d="M13 2.4 L13.2 5.3 M13.1 21 L12.8 23.7 M2.6 13.1 L5.5 13 M20.6 12.8 L23.5 13.1 M5.5 5.9 L7.5 7.8 M18.4 18.3 L20.4 20.1 M20.3 5.6 L18.3 7.6 M7.7 18.5 L5.8 20.3" stroke="#F4A300" stroke-width="2.1"/></svg>',
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.9 3.5 Q9.1 4.4 8.8 12.9 Q8.5 21.3 16.5 22.7 Q11 18.9 11.2 13 Q11.4 7.2 16.9 3.5 Z" stroke="#F4A300" stroke-width="2.2"/><path d="M15.6 5.3 Q10.4 6.7 10.2 12.9 Q10 18.7 14.8 21" stroke="#F4A300" stroke-width="1" opacity=".4"/></svg>',
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M1.8 20.4 Q4 15.2 7.1 12.3 Q10.2 15.4 12.6 20.6" stroke="#87AE73" stroke-width="2.3"/><path d="M9.3 20.5 Q12.8 11.4 16.1 9 Q19.7 12.6 23.2 20.3" stroke="#2E8B57" stroke-width="2.3"/><path d="M10.6 19.6 Q13.4 12.9 16 10.6" stroke="#2E8B57" stroke-width="1" opacity=".4"/></svg>',
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M2.4 9.6 Q5.5 6.9 8.6 9.5 Q11.7 12.2 14.7 9.6 Q17.7 7 21 9.4" stroke="#8ea3c4" stroke-width="2.3"/><path d="M3 15.4 Q6.1 12.7 9.2 15.3 Q12.3 18 15.3 15.4 Q18.3 12.8 21.6 15.2" stroke="#8ea3c4" stroke-width="2.3"/><path d="M3.6 16.4 Q6.3 14.2 8.9 16.2" stroke="#8ea3c4" stroke-width="1" opacity=".45"/></svg>',
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M3.2 13.2 Q6 8.7 9.3 12.6" stroke="#1D1615" stroke-width="2.1"/><path d="M12.9 8.7 Q15.8 4.4 19 8.2" stroke="#1D1615" stroke-width="2.1"/><path d="M8.9 18.6 Q11.4 14.8 14.3 18.2" stroke="#1D1615" stroke-width="1.9"/></svg>',
+  '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.1 3.9 Q17 3 17.8 6.3 Q21.3 7.2 20 10.7 Q21.7 13.8 18.1 15 Q16.7 17.9 13.1 17 Q9.6 18 8.2 15.1 Q4.7 14 6.2 10.6 Q5 7.2 8.5 6.4 Q9.3 3.1 13.1 3.9 Z" stroke="#2E8B57" stroke-width="2.2"/><path d="M12.9 5.4 Q15.9 4.9 16.5 7.2" stroke="#2E8B57" stroke-width="1" opacity=".4"/><path d="M12.9 17.2 Q13.2 19.7 12.8 22.6 M12.9 20 Q11 19.2 10.2 17.9" stroke="#1A2421" stroke-width="2"/></svg>'];
  function openSection(name){
   if(name==='About'){openPaperPage('about.html','about','About');return;}
   var sec=SECTIONS.filter(function(s){return s.name===name;})[0];
@@ -1011,13 +1024,8 @@
   var NS='http://www.w3.org/2000/svg';
   var lines=document.createElementNS(NS,'svg');
   lines.setAttribute('class','wconlines');
-  lines.setAttribute('viewBox','0 0 100 100');
-  lines.setAttribute('preserveAspectRatio','none');
   lines.setAttribute('aria-hidden','true');
-  var dd='';
-  pts.forEach(function(q,i){dd+=(i?'L':'M')+(q.x+4)+' '+(q.y+3)+' ';});
   var path=document.createElementNS(NS,'path');
-  path.setAttribute('d',dd);
   lines.appendChild(path);
   cons.appendChild(lines);
   setTimeout(function(){d.items.forEach(function(it){fetchDoc(it.href);});},300);
@@ -1026,10 +1034,26 @@
    b.type='button';
    b.style.left=pts[i].x+'%';
    b.style.top=pts[i].y+'%';
-   b.innerHTML=DOODLES[i%DOODLES.length]+'<span></span>';
+   b.innerHTML=DOODLES[((DOODLE_OFF[sec.name]||0)+i)%DOODLES.length]+'<span></span>';
    b.querySelector('span').textContent=it.t;
    b.addEventListener('click',function(){openProject(sec.name,it);});
   });
+  /* connect-the-dots through the doodles' real pixel centres, so the line
+     meets its drawings on every screen size */
+  function drawLine(){
+   if(!cons.isConnected)return;
+   var r=cons.getBoundingClientRect();
+   if(r.width<10)return;
+   lines.setAttribute('viewBox','0 0 '+Math.round(r.width)+' '+Math.round(r.height));
+   var dd='';
+   [].slice.call(cons.querySelectorAll('.wstar svg')).forEach(function(ic,i){
+    var br=ic.getBoundingClientRect();
+    dd+=(i?'L':'M')+(br.left-r.left+br.width/2).toFixed(1)+' '+(br.top-r.top+br.height/2).toFixed(1)+' ';
+   });
+   path.setAttribute('d',dd);
+  }
+  requestAnimationFrame(drawLine);
+  window.addEventListener('resize',drawLine);
  }
  function openProject(secName,it){
   state.view={type:'paper',sec:secName,title:it.t};
