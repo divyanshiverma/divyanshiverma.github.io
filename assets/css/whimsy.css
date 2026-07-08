@@ -2,7 +2,8 @@
 
 /* the whimsy desk exists on home; hidden unless the mode is on */
 .wdesk{display:none}
-html[data-mode="whimsy"] .wdesk{display:block;position:relative;z-index:2;max-width:min(88rem,calc(100vw - 3rem));margin:0 auto}
+html[data-mode="whimsy"] .wdesk{display:block;position:relative;z-index:2;max-width:min(96rem,calc(100vw - 2.5rem));margin:0 auto}
+html[data-mode="whimsy"] body.has-whimsy .desk{padding:1.1rem 1rem .5rem}
 html[data-mode="whimsy"] body.has-whimsy .bookwrap,
 html[data-mode="whimsy"] body.has-whimsy .crumb,
 html[data-mode="whimsy"] body.has-whimsy .tabs,
@@ -14,17 +15,20 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 
 /* ---- the paint area: bevelled cream chrome ---- */
 .wpaint{background:#F7EED9;border:1.5px solid var(--ink,#1D1615);border-radius:10px;overflow:hidden;
- box-shadow:6px 8px 0 rgba(31,9,84,.12)}
-.wmain{display:grid;grid-template-columns:60px 1fr 220px}
-.wtools{padding:7px 6px;display:grid;grid-template-columns:1fr 1fr;gap:3px;align-content:start}
+ box-shadow:6px 8px 0 rgba(31,9,84,.12);
+ display:flex;flex-direction:column;
+ height:calc(100dvh - 3.75rem - 7.1rem)}
+.wmenu,.wbar{flex:none}
+.wmain{display:grid;grid-template-columns:60px 1fr 230px;flex:1;min-height:0}
+.wtools{padding:7px 6px;display:grid;grid-template-columns:1fr 1fr;gap:3px;align-content:start;overflow-y:auto;min-height:0}
 .wtool{height:26px;background:linear-gradient(180deg,#fffdf6,#f0e6c9 55%,#e6d9b8);
  border:1px solid;border-color:#fffdf6 #b9ac8f #b9ac8f #fffdf6;border-radius:2px;
  box-shadow:1px 1px 0 rgba(29,22,21,.22),inset 0 1px 0 #fffdf6;
  display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;user-select:none}
 .wtool.sel{background:linear-gradient(180deg,#e2d5b2,#efe4c8);
  border-color:#b9ac8f #fffdf6 #fffdf6 #b9ac8f;box-shadow:inset 1px 1px 2px rgba(29,22,21,.25)}
-.wstage{position:relative;margin:7px 0 7px 2px;min-width:0;align-self:start}
-.wcanvhold{height:min(34rem,62vh);padding:7px;background:#E5D8B8;border:1px solid;border-color:#b9ac8f #fffdf6 #fffdf6 #b9ac8f;margin:0}
+.wstage{position:relative;margin:7px 0 7px 2px;min-width:0;min-height:0}
+.wcanvhold{height:100%;padding:7px;background:#E5D8B8;border:1px solid;border-color:#b9ac8f #fffdf6 #fffdf6 #b9ac8f;margin:0}
 /* ---- the window menu row: the site lives inside the program ---- */
 .wmenu{display:flex;gap:3px;align-items:center;padding:6px 10px;border-bottom:1.5px solid #d8cdb2;
  background:linear-gradient(180deg,#FBF3E0,#F3E9CF)}
@@ -72,7 +76,7 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 .wdesk.reading .wtools,.wdesk.reading .wbar{opacity:.45;pointer-events:none}
 .wdesk.reading .wtray,.wdesk.reading .wpeel,.wdesk.reading .whandtray{display:none}
 .wcanvhold canvas{background:#fff;display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
-.wintro{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.wintro{padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:0;overflow-y:auto}
 .wid{display:flex;flex-direction:column;gap:10px}
 .whand{font-family:'Satisfy',Georgia,serif;font-size:.95rem;color:#6f6a5c;margin:0}
 .windex{display:flex;flex-direction:column}
@@ -85,7 +89,7 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
  box-shadow:3px 3px 0 rgba(29,22,21,.15);position:relative}
 .wnote::before{content:"";position:absolute;top:-9px;left:28%;width:56px;height:14px;
  background:rgba(135,174,115,.55);transform:rotate(-3deg)}
-.wnote img{width:100%;display:block;border:1px solid #1D1615}
+.wnote img{width:100%;display:block;border:1px solid #1D1615;max-height:11rem;object-fit:cover}
 .wid p{font-family:'Fraunces',Georgia,serif;font-size:.8rem;line-height:1.55;color:#1D1615;margin:0}
 .wbar{display:flex;align-items:center;gap:10px;padding:7px 12px;border-top:1px solid #d8cdb2}
 .wfgbg{position:relative;width:30px;height:30px;flex:none}
@@ -139,37 +143,44 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 /* whimsy corner motifs, empty spaces only */
 .wcorner{position:absolute;pointer-events:none;opacity:.5}
 
-/* mobile: menu, canvas (the stage), tools, palette, intro. everything visible. */
+/* mobile: a real paint app. canvas up top, one compact tool strip, palette,
+   then a tight intro. the index list is gone (the menu row IS the index).
+   sections and pages open as FULL-SCREEN sheets, not boxes inside scrolls. */
 @media(max-width:940px),(max-height:520px) and (pointer:coarse){
- .wpaint{display:flex;flex-direction:column}
+ .wpaint{display:flex;flex-direction:column;height:auto}
  .wmenu{order:0;overflow-x:auto;flex:none}
  .wmitem{flex:none}
  .wback{flex:none}
  .wmain{display:contents}
  .wstage{margin:7px 7px 0;order:1}
- .wcanvhold{height:min(24rem,44vh)}
- .wdesk.reading .wcanvhold,.wdesk.reading .wview{position:relative}
- .wdesk.reading .wstage{display:flex;flex-direction:column}
- .wdesk.reading .wcanvhold{display:none}
- .wdesk.reading .wview{inset:auto;height:min(34rem,66vh)}
- .wtools{order:2;grid-template-columns:repeat(8,1fr);padding:7px}
- .wsizes{grid-column:1/-1;flex-direction:row;gap:6px;padding:3px 4px}
- .wsizeopt{flex:1;height:18px}
- .wbar{order:3;flex-wrap:wrap;row-gap:8px}
- .wchips{order:1;flex:1 1 100%;grid-template-columns:repeat(14,minmax(12px,1fr));width:100%}
+ .wcanvhold{height:min(26rem,48vh)}
+ .wtools{order:2;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:4px;padding:7px;align-items:center}
+ .wtool{width:34px;height:30px;flex:none}
+ .wsizes{display:flex;flex:none;flex-direction:row;gap:4px;padding:3px 4px;margin:0 0 0 4px}
+ .wsizeopt{width:26px;height:18px;flex:none}
+ .wbar{order:3;flex-wrap:wrap;row-gap:7px;padding:6px 10px}
+ .wchips{order:1;flex:1 1 100%;grid-template-columns:repeat(14,minmax(12px,1fr));grid-template-rows:14px 14px;width:100%}
  .wfgbg{order:2}
  .wacts{order:3}
- .wintro{order:4;border-top:1px solid #d8cdb2;max-height:none;overflow:visible}
- .wid{flex-direction:row;align-items:center}
- .wnote{width:38%;flex:none}
+ .wintro{order:4;border-top:1px solid #d8cdb2;overflow:visible;padding:10px 12px}
+ .wid{flex-direction:row;align-items:center;gap:10px}
+ .wnote{width:96px;flex:none;transform:rotate(1deg)}
+ .wnote img{max-height:none}
+ .windex,.windexhand{display:none}
+ .wtray{flex-wrap:nowrap;overflow-x:auto;gap:12px;padding-bottom:4px}
+ .wtray .wstick svg{height:24px}
+ /* reading = a full-screen sheet under the nav, one honest scroll */
+ .wdesk.reading .wcanvhold{display:none}
+ .wdesk.reading .wview{position:fixed;top:3.75rem;left:0;right:0;bottom:0;z-index:70;
+  height:auto;display:flex;padding:9px}
+ body.wreading{overflow:hidden}
  .wsecview{flex-direction:column;overflow-y:auto}
- .wcons{min-height:16rem;flex:none}
+ .wcons{min-height:17rem;flex:none}
  .wstar{max-width:72%}
- .wpaper{padding:12px 12px 44px}
- /* the way home floats in thumb reach, above the trail pill */
- html[data-mode="whimsy"] .wdesk.reading .wback{position:fixed;right:12px;bottom:56px;z-index:56}
+ .wpaper{padding:12px 12px 46px}
+ /* the way home floats in thumb reach, above the sheet */
+ html[data-mode="whimsy"] .wdesk.reading .wback{position:fixed;right:12px;bottom:56px;z-index:75}
 }
-
 /* trail on/off, floats under the nav on the right, whimsy only */
 .wtrailtog{display:none}
 html[data-mode="whimsy"] .wtrailtog{display:inline-flex;position:fixed;right:14px;top:64px;z-index:55;
