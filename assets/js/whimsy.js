@@ -967,6 +967,17 @@
  }
  window.__wBack=backToDrawing;
  function hashStr(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
+ /* the constellation markers are kid drawings, not stars: the things everyone
+    drew in MS Paint. house, sun, moon, hills, river, v-birds, tree; the list
+    cycles if a section has more pages than that (Div's call, Jul 9). */
+ var DOODLES=[
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.5 L12 4.5 L20.5 11.5" stroke="#B72025"/><path d="M6 10.6 V19 H18 V10.6 M10.8 19 V14.2 H13.6 V19" stroke="#1A2421"/></svg>',
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" stroke="#F4A300"/><path d="M12 3.2v2.6M12 18.2v2.6M3.2 12h2.6M18.2 12h2.6M5.7 5.7l1.9 1.9M16.4 16.4l1.9 1.9M18.3 5.7l-1.9 1.9M7.6 16.4l-1.9 1.9" stroke="#F4A300"/></svg>',
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M14.5 3.6 A8.6 8.6 0 1 0 14.5 20.4 A6.7 6.7 0 1 1 14.5 3.6 Z" stroke="#F4A300"/></svg>',
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M1.8 19 Q7 10.5 12.2 19" stroke="#87AE73"/><path d="M9.4 19 Q15.4 8.6 22.2 19" stroke="#2E8B57"/></svg>',
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 9.5 q3 -2.6 6 0 q3 2.6 6 0 q3 -2.6 6.5 0 M2.5 15 q3 -2.6 6 0 q3 2.6 6 0 q3 -2.6 6.5 0" stroke="#8ea3c4"/></svg>',
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M3.5 12.5 q2.9 -3.8 5.8 0 M12.6 8.5 q2.9 -3.8 5.8 0 M8.5 17 q2.6 -3.4 5.2 0" stroke="#1D1615"/></svg>',
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6 a5.6 5.6 0 0 1 4.9 8.3 a4.4 4.4 0 0 1 -4.4 4 a4.6 4.6 0 0 1 -5.4 -4 a5.6 5.6 0 0 1 4.9 -8.3 Z" stroke="#2E8B57"/><path d="M12 15.9 V20.4 M12 18 q-2.2 -.7 -3 -2" stroke="#1A2421"/></svg>'];
  function openSection(name){
   if(name==='About'){openPaperPage('about.html','about','About');return;}
   var sec=SECTIONS.filter(function(s){return s.name===name;})[0];
@@ -987,7 +998,7 @@
   var h=el('h3',null,tx);
   h.textContent=sec.name;
   var hint=el('p','whand',tx);
-  hint.textContent='each star is one page, open it';
+  hint.textContent='each little drawing is one page, open it';
   d.leads.forEach(function(txt){var pp=el('p',null,tx);pp.textContent=txt;});
   var cons=el('div','wcons',sv);
   var n=Math.max(1,d.items.length);
@@ -1015,7 +1026,7 @@
    b.type='button';
    b.style.left=pts[i].x+'%';
    b.style.top=pts[i].y+'%';
-   b.innerHTML='<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 L11.8 8.2 L19 10 L11.8 11.8 L10 19 L8.2 11.8 L1 10 L8.2 8.2 Z" fill="#B72025"/></svg><span></span>';
+   b.innerHTML=DOODLES[i%DOODLES.length]+'<span></span>';
    b.querySelector('span').textContent=it.t;
    b.addEventListener('click',function(){openProject(sec.name,it);});
   });

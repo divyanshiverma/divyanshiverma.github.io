@@ -56,7 +56,8 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 .wstar{position:absolute;display:flex;align-items:center;gap:7px;max-width:46%;
  background:none;border:0;padding:2px;cursor:pointer;text-align:left;
  font-family:'Fraunces',Georgia,serif;font-size:.85rem;color:#1D1615}
-.wstar svg{flex:none}
+.wstar svg{flex:none;transition:transform .18s ease}
+.wstar:hover svg,.wstar:focus-visible svg{transform:rotate(-9deg) scale(1.15)}
 .wstar:hover span,.wstar:focus-visible span{color:#B72025;text-decoration:underline;text-underline-offset:3px}
 .wstar.flip{transform:translateX(-100%);flex-direction:row-reverse;text-align:right}
 .wpaperview{display:flex;flex-direction:column;flex:1;min-height:0;gap:5px}
