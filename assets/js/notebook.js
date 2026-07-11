@@ -719,55 +719,105 @@
   });
  }
  /* Div's motifs on blank page space. Day: the quiet blank-page five (magic +
-    floral diagrams). Night: the celestial set in random order — blank sky
-    space is the ONLY place night motifs live (never margins, never the home
-    constellation sky). Whimsy paints its own paper. */
- function nightSkyMotifs(pool){
-  var sky=document.querySelector('.sky');
-  if(!sky||sky.classList.contains('home-sky'))return;
-  var W=sky.offsetWidth,H=sky.offsetHeight;
-  if(!W||!H)return;
-  var key='night:'+W+'x'+H;
-  if(sky.dataset.blankmKey===key)return;
-  sky.dataset.blankmKey=key;
-  [].slice.call(sky.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
-  var zr=sky.getBoundingClientRect();
-  var zf=(zr.height/H)||1;                     // fitScreen zooms the sky
-  var boxes=[];
-  [].slice.call(sky.querySelectorAll('p,h1,h2,h3,table,img,li,td,a,figure'))
-   .forEach(function(x){
-    var r=x.getBoundingClientRect();
-    if(!r.width||!r.height)return;
-    boxes.push({l:(r.left-zr.left)/zf,t:(r.top-zr.top)/zf,
-                r:(r.right-zr.left)/zf,b:(r.bottom-zr.top)/zf});
+    floral diagrams). Night: 1-2 celestial motifs, random order, ONLY in the
+    space left over after content in projects/posts (body.pg-piece) — never
+    sections, never the home sky, never margins. Whimsy paints its own paper. */
+ function nightBlankMotifs(pool){
+  if(!document.body.classList.contains('pg-piece')||!sheet)return;
+  /* the space left over after a project's content, two shapes of it:
+     a) content ended on an odd column -> the endmotif stretches over a whole
+        blank page; deal into its top/bottom bands (its celestial art is
+        centred and stays clear)
+     b) content ended mid-column -> the tail of the last column is the
+        leftover; deal below the last element */
+  var em=sheet.querySelector('.endmotif');
+  var box=null,bands=null;
+  if(em&&em.offsetWidth&&em.offsetHeight>=170){
+   box={l:em.offsetLeft,t:em.offsetTop,w:em.offsetWidth,h:em.offsetHeight};
+   bands=Math.random()<.5?[[6,20],[64,78]]:[[64,78],[6,20]];
+  }else{
+   var kids=[].slice.call(sheet.children).filter(function(x){
+    return !x.classList.contains('blankm')&&!x.classList.contains('colspacer')
+           &&x.offsetHeight>0;
    });
+   var last=kids[kids.length-1];
+   if(!last)return;
+   var cs=getComputedStyle(sheet);
+   var useH=sheet.clientHeight-(parseFloat(cs.paddingBottom)||0);
+   var top=last.offsetTop+last.offsetHeight;
+   if(useH-top<170)return;
+   box={l:last.offsetLeft,t:top+14,
+        w:Math.min(last.offsetWidth||480,Math.round(sheet.clientWidth/2)),
+        h:useH-top-22};
+   bands=[[4,30],[52,74]];
+  }
+  var key='night:'+Math.round(box.l)+':'+Math.round(box.t)+':'+Math.round(box.h);
+  if(sheet.dataset.blankmKey===key)return;
+  sheet.dataset.blankmKey=key;
+  [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
   var seq=pool.slice();
   for(var i=seq.length-1;i>0;i--){
    var j=(Math.random()*(i+1))|0,t=seq[i];seq[i]=seq[j];seq[j]=t;
   }
+  var n=box.h<340?1:1+(Math.random()<.5?1:0);
   var wrap=document.createElement('div');
   wrap.className='blankm';wrap.setAttribute('aria-hidden','true');
-  wrap.style.cssText='left:0;top:0;width:'+W+'px;height:'+H+'px';
-  var placed=0,target=Math.min(4,seq.length),pad=26;
-  for(var a=0;a<90&&placed<target;a++){
-   var s=seq[placed%seq.length];
+  wrap.style.cssText='left:'+box.l+'px;top:'+box.t+'px;width:'+box.w
+   +'px;height:'+box.h+'px';
+  for(var m2=0;m2<n;m2++){
+   var b=bands[m2%2];
+   var sp=document.createElement('span');
+   sp.style.cssText='left:'+(8+Math.random()*44).toFixed(1)+'%;top:'
+    +(b[0]+Math.random()*(b[1]-b[0])).toFixed(1)+'%;'
+    +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);opacity:.85';
+   sp.appendChild(seq[m2%seq.length].cloneNode(true));
+   wrap.appendChild(sp);
+  }
+  sheet.appendChild(wrap);
+ }
+ /* the desk scatter: a handful of Div's motifs at RANDOM positions behind the
+    notebook, re-dealt every refresh. Day only — night is blank-pages-only,
+    and whimsy scatters its own paper (whimsy.js ghostPaper). */
+ function deskMotifs(){
+  var mode=document.documentElement.getAttribute('data-mode')||'day';
+  var desk=document.querySelector('.desk');
+  if(!desk)return;
+  var W=desk.clientWidth,H=desk.clientHeight;
+  var key=mode+':'+Math.round(W/80)+':'+Math.round(H/80);
+  if(desk.dataset.deskmKey===key)return;
+  desk.dataset.deskmKey=key;
+  [].slice.call(document.querySelectorAll('.deskm')).forEach(function(x){x.remove();});
+  if(mode!=='day')return;
+  var pool=[].slice.call(document.querySelectorAll('.m svg.md'));
+  if(!pool.length||W<400||H<300)return;
+  for(var i=pool.length-1;i>0;i--){
+   var j=(Math.random()*(i+1))|0,t=pool[i];pool[i]=pool[j];pool[j]=t;
+  }
+  var base=Math.round(W*H/160000);
+  var n=Math.max(6,Math.min(10,base));
+  var wrap=document.createElement('div');
+  wrap.className='deskm';wrap.setAttribute('aria-hidden','true');
+  var boxes=[],placed=0;
+  for(var a=0;a<n*16&&placed<n;a++){
+   var s=pool[placed%pool.length];
    var mw=parseFloat(s.getAttribute('width'))||90;
    var mh=parseFloat(s.getAttribute('height'))||80;
-   if(W<mw+40||H<mh+40)break;
-   var x=12+Math.random()*(W-mw-24),y=12+Math.random()*(H-mh-24);
+   if(W<mw+24||H<mh+24)break;
+   var x=8+Math.random()*(W-mw-16),y=8+Math.random()*(H-mh-16);
+   var pad=26;
    var hit=boxes.some(function(b){
     return x<b.r+pad&&x+mw>b.l-pad&&y<b.b+pad&&y+mh>b.t-pad;
    });
    if(hit)continue;
    var sp=document.createElement('span');
    sp.style.cssText='left:'+Math.round(x)+'px;top:'+Math.round(y)+'px;'
-    +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);opacity:.85';
+    +'transform:rotate('+(Math.random()*18-9).toFixed(1)+'deg)';
    sp.appendChild(s.cloneNode(true));
    wrap.appendChild(sp);
-   boxes.push({l:x,t:y,r:x+mw,b:y+mh});        // spread out, no clumping
+   boxes.push({l:x,t:y,r:x+mw,b:y+mh});
    placed++;
   }
-  if(placed)sky.appendChild(wrap);
+  desk.insertBefore(wrap,desk.firstChild);   // beneath the book, always
  }
  function blankMotifs(){
   var mode=document.documentElement.getAttribute('data-mode')||'day';
@@ -782,7 +832,7 @@
    pool=pool.filter(function(s){return five[s.getAttribute('aria-label')];});
   }
   if(!pool.length)return;
-  if(mode==='night'){nightSkyMotifs(pool);return;}
+  if(mode==='night'){nightBlankMotifs(pool);return;}
   if(!sheet)return;
   var cs=getComputedStyle(sheet);
   var padL=parseFloat(cs.paddingLeft)||0,padT=parseFloat(cs.paddingTop)||0;
@@ -841,6 +891,7 @@
   if(stickEnd)k=nSpreads-1;
   place();
   sizeVine();
+  deskMotifs();
   blankMotifs();
  }
  var pfDone={},pfText={},pfWait={};
@@ -961,11 +1012,12 @@
    if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();go('next');}
   });
   window.addEventListener('resize',refresh);
-  /* mode flips re-deal the blank-page motifs (night wants a fresh random order) */
+  /* mode flips re-deal the desk + blank-page motifs (fresh random each time) */
   new MutationObserver(function(){
    if(sheet)delete sheet.dataset.blankmKey;
-   var sk=document.querySelector('.sky');
-   if(sk)delete sk.dataset.blankmKey;
+   var dk=document.querySelector('.desk');
+   if(dk)delete dk.dataset.deskmKey;
+   deskMotifs();
    blankMotifs();
   }).observe(document.documentElement,{attributes:true,attributeFilter:['data-mode']});
   if(window.ResizeObserver&&sheet){var ro=new ResizeObserver(function(){refresh();});ro.observe(sheet);ro.observe(spread);}

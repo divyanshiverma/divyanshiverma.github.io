@@ -48,16 +48,21 @@ border-bottom:1.5px solid var(--deep)}
 /* desk */
 .desk{position:relative;margin:0 auto;padding:2.875rem 1.5rem 2.75rem;overflow:hidden;
 background-image:radial-gradient(circle,#EBE8DE 1px,transparent 1.2px);background-size:18px 18px;}
-.m{position:absolute;opacity:.8;pointer-events:none;z-index:0}
-.m svg.mn,.m svg.mw{display:none}
+/* .m divs are the motif SOURCE POOL only (day/night/crayon svg per slot) —
+   never shown; notebook.js deals clones onto the desk and blank pages, and
+   whimsy.js harvests the crayon ones for stickers + paper ghosts */
+.m{display:none}
+/* the desk scatter (notebook.js deskMotifs): random positions every refresh,
+   quiet 70% ink, behind the notebook. Day = a handful upright-ish; whimsy =
+   more of them, any orientation */
+.deskm{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deskm span{position:absolute;opacity:.7}
+.deskm svg{display:block}
 /* motifs on blank page space (notebook.js blankMotifs): day = the quiet
-   blank-page five; night = the celestial set, random order, ONLY here */
+   blank-page five; night = 1-2 celestial, projects/posts only, random order */
 .blankm{position:absolute;pointer-events:none;z-index:0;overflow:hidden}
 .blankm span{position:absolute}
 .blankm svg{display:block}
-/* the lowest side slots need a tall desk; on short screens they'd pile into
-   the bottom corners */
-@media(max-height:920px){.m.m-tall{display:none}}
 .bookwrap{position:relative;z-index:2;max-width:70rem;margin:0 auto;perspective:2400px}
 .crumb{font-size:var(--fs-sm);color:var(--soft);margin:0 .375rem .625rem 0;text-align:right;min-height:1.5rem}
 /* the book */

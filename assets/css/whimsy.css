@@ -28,7 +28,12 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 .wtool.sel{background:linear-gradient(180deg,#e2d5b2,#efe4c8);
  border-color:#b9ac8f #fffdf6 #fffdf6 #b9ac8f;box-shadow:inset 1px 1px 2px rgba(29,22,21,.25)}
 .wstage{position:relative;margin:7px 0 7px 2px;min-width:0;min-height:0}
-.wcanvhold{height:100%;padding:7px;background:#E5D8B8;border:1px solid;border-color:#b9ac8f #fffdf6 #fffdf6 #b9ac8f;margin:0}
+.wcanvhold{height:100%;padding:7px;background:#E5D8B8;border:1px solid;border-color:#b9ac8f #fffdf6 #fffdf6 #b9ac8f;margin:0;position:relative}
+/* the paper UNDER the drawing: Div's crayon motifs, always there, denser and
+   more freely rotated than the day desk; strokes and stickers ride on top */
+.wghost{position:absolute;inset:7px;background:#fff;overflow:hidden;pointer-events:none}
+.wghost span{position:absolute;opacity:.32}
+.wghost svg{display:block}
 /* ---- the window menu row: the site lives inside the program ---- */
 .wmenu{display:flex;gap:3px;align-items:center;padding:6px 10px;border-bottom:1.5px solid #d8cdb2;
  background:linear-gradient(180deg,#FBF3E0,#F3E9CF)}
@@ -76,7 +81,7 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 /* tools sleep while reading */
 .wdesk.reading .wtools,.wdesk.reading .wbar{opacity:.45;pointer-events:none}
 .wdesk.reading .wtray,.wdesk.reading .wpeel,.wdesk.reading .whandtray{display:none}
-.wcanvhold canvas{background:#fff;display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
+.wcanvhold canvas{background:transparent;position:relative;z-index:1;display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 .wintro{padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:0;overflow-y:auto}
 .wid{display:flex;flex-direction:column;gap:10px}
 .whand{font-family:'Satisfy',Georgia,serif;font-size:.95rem;color:#6f6a5c;margin:0}
