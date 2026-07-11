@@ -735,6 +735,14 @@
   var mode=document.documentElement.getAttribute('data-mode')||'day';
   var desk=document.querySelector('.desk');
   if(!desk)return;
+  var wd=null;
+  if(mode==='whimsy'){
+   /* whimsy motifs live in the BACKGROUND ONLY — the bands around the whole
+      paint tool, 12 minimum at all times (Div). If the tool is not built
+      yet, wait for a later refresh instead of dealing blind. */
+   wd=document.querySelector('.wdesk');
+   if(!wd||!wd.offsetHeight)return;
+  }
   var W=desk.clientWidth,H=desk.clientHeight;
   var key=mode+':'+Math.round(W/80)+':'+Math.round(H/80);
   if(desk.dataset.deskmKey===key)return;
@@ -747,32 +755,86 @@
   for(var i=pool.length-1;i>0;i--){
    var j=(Math.random()*(i+1))|0,t=pool[i];pool[i]=pool[j];pool[j]=t;
   }
-  var base=Math.round(W*H/90000);
-  var n=mode==='whimsy'?Math.max(20,Math.min(28,Math.round(base*1.7)))
-                       :Math.max(12,Math.min(18,base));
   var wrap=document.createElement('div');
   wrap.className='deskm';wrap.setAttribute('aria-hidden','true');
   var boxes=[],placed=0;
-  for(var a=0;a<n*16&&placed<n;a++){
-   var s=pool[placed%pool.length];
-   var mw=parseFloat(s.getAttribute('width'))||90;
-   var mh=parseFloat(s.getAttribute('height'))||80;
-   if(W<mw+24||H<mh+24)break;
-   var x=8+Math.random()*(W-mw-16),y=8+Math.random()*(H-mh-16);
-   var pad=mode==='whimsy'?10:18;
-   var hit=boxes.some(function(b){
-    return x<b.r+pad&&x+mw>b.l-pad&&y<b.b+pad&&y+mh>b.t-pad;
-   });
-   if(hit)continue;
+  function put(s,x,y,mw,mh,anyAngle){
    var sp=document.createElement('span');
-   var rot=mode==='whimsy'?(Math.random()*360).toFixed(0)
-                          :(Math.random()*18-9).toFixed(1);
+   var rot=anyAngle?(Math.random()*360).toFixed(0)
+                   :(Math.random()*18-9).toFixed(1);
    sp.style.cssText='left:'+Math.round(x)+'px;top:'+Math.round(y)+'px;'
     +'transform:rotate('+rot+'deg)';
-   sp.appendChild(s.cloneNode(true));
+   sp.appendChild(s);
    wrap.appendChild(sp);
    boxes.push({l:x,t:y,r:x+mw,b:y+mh});
    placed++;
+  }
+  function clash(x,y,mw,mh,pad){
+   return boxes.some(function(b){
+    return x<b.r+pad&&x+mw>b.l-pad&&y<b.b+pad&&y+mh>b.t-pad;
+   });
+  }
+  if(wd){
+   /* the visible whimsy background = the bands around the tool */
+   var dr=desk.getBoundingClientRect(),wr=wd.getBoundingClientRect();
+   var kl=wr.left-dr.left-6,kt=wr.top-dr.top-6,
+       kr=wr.right-dr.left+6,kb=wr.bottom-dr.top+6;
+   var bands=[
+    {x:8,y:8,w:W-16,h:kt-12},
+    {x:8,y:kb+4,w:W-16,h:H-kb-10},
+    {x:8,y:Math.max(8,kt),w:kl-12,h:Math.min(H-8,kb)-Math.max(8,kt)},
+    {x:kr+4,y:Math.max(8,kt),w:W-kr-10,h:Math.min(H-8,kb)-Math.max(8,kt)}
+   ].filter(function(b){return b.w>=70&&b.h>=40;});
+   if(!bands.length)return;
+   var area=0;
+   bands.forEach(function(b){area+=b.w*b.h;});
+   var n=Math.max(12,Math.min(20,Math.round(area/26000)));
+   for(var a=0;a<n*30&&placed<n;a++){
+    var pick=Math.random()*area,b=bands[0],acc=0;
+    for(var bi=0;bi<bands.length;bi++){
+     acc+=bands[bi].w*bands[bi].h;
+     if(pick<=acc){b=bands[bi];break;}
+    }
+    var s=pool[placed%pool.length].cloneNode(true);
+    var mw=parseFloat(s.getAttribute('width'))||90;
+    var mh=parseFloat(s.getAttribute('height'))||80;
+    /* pick the angle FIRST: the rotated footprint must fit the band, or a
+       spun motif pokes under the paint tool */
+    var th=Math.random()*360,rad=th*Math.PI/180;
+    var ac=Math.abs(Math.cos(rad)),as=Math.abs(Math.sin(rad));
+    var bw=mw*ac+mh*as,bh=mw*as+mh*ac;
+    var f=Math.min(1,(b.h-2)/bh,96/bh);
+    if(f<0.45)continue;
+    if(f<1){
+     s.setAttribute('width',Math.round(mw*f));
+     s.setAttribute('height',Math.round(mh*f));
+     mw=Math.round(mw*f);mh=Math.round(mh*f);
+     bw=mw*ac+mh*as;bh=mw*as+mh*ac;
+    }
+    if(b.w<bw+4)continue;
+    var x=b.x+Math.random()*(b.w-bw),y=b.y+Math.random()*(b.h-bh);
+    /* crowd rather than come up short past 2/3 of the attempts */
+    if(!(placed<12&&a>n*20)&&clash(x,y,bw,bh,8))continue;
+    var sp=document.createElement('span');
+    sp.style.cssText='left:'+Math.round(x+(bw-mw)/2)+'px;top:'
+     +Math.round(y+(bh-mh)/2)+'px;transform:rotate('+th.toFixed(0)+'deg)';
+    sp.appendChild(s);
+    wrap.appendChild(sp);
+    boxes.push({l:x,t:y,r:x+bw,b:y+bh});
+    placed++;
+   }
+  }else{
+   var base=Math.round(W*H/90000);
+   var n2=Math.max(12,Math.min(18,base));
+   for(var a2=0;a2<n2*16&&placed<n2;a2++){
+    var s2=pool[placed%pool.length].cloneNode(true);
+    var mw2=parseFloat(s2.getAttribute('width'))||90;
+    var mh2=parseFloat(s2.getAttribute('height'))||80;
+    if(W<mw2+24||H<mh2+24)break;
+    var x2=8+Math.random()*(W-mw2-16),y2=8+Math.random()*(H-mh2-16);
+    if(clash(x2,y2,mw2,mh2,18))continue;
+    put(s2,x2,y2,mw2,mh2,false);
+   }
   }
   desk.insertBefore(wrap,desk.firstChild);   /* beneath the book, always */
  }
@@ -950,6 +1012,10 @@
    if(dk)delete dk.dataset.deskmKey;
    deskMotifs();
    endDeal();
+   /* entering whimsy: the paint tool builds a beat later than the mode flips,
+      and the background deal waits for its box — retry once it exists */
+   setTimeout(deskMotifs,450);
+   setTimeout(deskMotifs,1300);
   }).observe(document.documentElement,{attributes:true,attributeFilter:['data-mode']});
   if(window.ResizeObserver&&sheet){var ro=new ResizeObserver(function(){refresh();});ro.observe(sheet);ro.observe(spread);}
   setTimeout(refresh,400);setTimeout(refresh,1200);
