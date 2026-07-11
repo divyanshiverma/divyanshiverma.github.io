@@ -724,63 +724,75 @@
     body.pg-piece. Whimsy paints its own paper instead. */
  function pieceBlankMotifs(pool,mode){
   if(!document.body.classList.contains('pg-piece')||!sheet)return;
-  /* the space left over after a project's content, two shapes of it:
-     a) content ended on an odd column -> the endmotif stretches over a whole
-        blank page; deal into its top/bottom bands (its celestial art is
-        centred and stays clear)
-     b) content ended mid-column -> the tail of the last column is the
-        leftover; deal below the last element */
-  var em=sheet.querySelector('.endmotif');
-  var box=null,bands=null;
-  if(em&&em.offsetWidth&&em.offsetHeight>=170){
-   box={l:em.offsetLeft,t:em.offsetTop,w:em.offsetWidth,h:em.offsetHeight};
-   bands=Math.random()<.5?[[6,20],[64,78]]:[[64,78],[6,20]];
-  }else{
-   /* chrome (page arrows etc.) is NOT content — counting it used to swallow
-      the leftover space on most projects, so their ends stayed bare */
-   var kids=[].slice.call(sheet.children).filter(function(x){
-    return !x.classList.contains('blankm')&&!x.classList.contains('colspacer')
-           &&!x.classList.contains('pagenav')&&!x.classList.contains('pdfnote')
-           &&x.offsetHeight>0;
-   });
-   var last=kids[kids.length-1];
-   if(!last)return;
-   var cs=getComputedStyle(sheet);
-   var useH=sheet.clientHeight-(parseFloat(cs.paddingBottom)||0);
-   var nav=sheet.querySelector('.pagenav');
-   if(nav&&nav.offsetHeight&&Math.abs(nav.offsetLeft-last.offsetLeft)<last.offsetWidth)
-    useH=Math.min(useH,nav.offsetTop-8);
-   var top=last.offsetTop+last.offsetHeight;
-   if(useH-top<100)return;
-   box={l:last.offsetLeft,t:top+12,
-        w:Math.min(last.offsetWidth||480,Math.round(sheet.clientWidth/2)),
-        h:useH-top-18};
-   bands=[[4,30],[52,74]];
+  function deal(wrap,n,bands,scaleH){
+   var seq=pool.slice();
+   for(var i=seq.length-1;i>0;i--){
+    var j=(Math.random()*(i+1))|0,t=seq[i];seq[i]=seq[j];seq[j]=t;
+   }
+   for(var m2=0;m2<n;m2++){
+    var b=bands[m2%bands.length];
+    var sp=document.createElement('span');
+    sp.style.cssText='left:'+(8+Math.random()*44).toFixed(1)+'%;top:'
+     +(b[0]+Math.random()*(b[1]-b[0])).toFixed(1)+'%;'
+     +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);'
+     +'opacity:'+(mode==='night'?'.85':'.65');
+    var svg=seq[m2%seq.length].cloneNode(true);
+    if(scaleH){
+     var sw=parseFloat(svg.getAttribute('width'))||90;
+     var sh=parseFloat(svg.getAttribute('height'))||80;
+     var f=Math.min(1,scaleH/sh);
+     if(f<1){svg.setAttribute('width',Math.round(sw*f));
+             svg.setAttribute('height',Math.round(sh*f));}
+    }
+    sp.appendChild(svg);
+    wrap.appendChild(sp);
+   }
   }
-  var key=mode+':'+Math.round(box.l)+':'+Math.round(box.t)+':'+Math.round(box.h);
+  /* content ended on an odd column: the endmotif fills the whole blank page.
+     Deal INSIDE it — measure() toggles its display every pass and pagination
+     slides the sheet, so an absolutely-placed sheet wrap would drift; a child
+     rides along for free. Its own art is centred; the bands stay clear. */
+  var em=sheet.querySelector('.endmotif');
+  if(em&&em.offsetHeight>170){
+   if(em.dataset.bmMode===mode&&em.querySelector('.blankm'))return;
+   em.dataset.bmMode=mode;
+   [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
+   var wrap=document.createElement('div');
+   wrap.className='blankm';wrap.setAttribute('aria-hidden','true');
+   wrap.style.cssText='left:0;top:0;width:100%;height:100%';
+   deal(wrap,1+(Math.random()<.5?1:0),
+        Math.random()<.5?[[5,20],[64,78]]:[[64,78],[5,20]]);
+   em.appendChild(wrap);
+   return;
+  }
+  /* content ended mid-column: the tail of the last column is the leftover.
+     Chrome (page arrows, the hidden endmotif itself) is not content. */
+  var kids=[].slice.call(sheet.children).filter(function(x){
+   return !x.classList.contains('blankm')&&!x.classList.contains('colspacer')
+          &&!x.classList.contains('pagenav')&&!x.classList.contains('pdfnote')
+          &&!x.classList.contains('endmotif')&&x.offsetHeight>0;
+  });
+  var last=kids[kids.length-1];
+  if(!last)return;
+  var cs=getComputedStyle(sheet);
+  var useH=sheet.clientHeight-(parseFloat(cs.paddingBottom)||0);
+  var nav=sheet.querySelector('.pagenav');
+  if(nav&&nav.offsetHeight&&Math.abs(nav.offsetLeft-last.offsetLeft)<last.offsetWidth)
+   useH=Math.min(useH,nav.offsetTop-8);
+  var top=last.offsetTop+last.offsetHeight;
+  var free=useH-top;
+  if(free<96)return;
+  var key=mode+':'+Math.round(last.offsetLeft)+':'+Math.round(top)+':'+Math.round(free);
   if(sheet.dataset.blankmKey===key)return;
   sheet.dataset.blankmKey=key;
   [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
-  var seq=pool.slice();
-  for(var i=seq.length-1;i>0;i--){
-   var j=(Math.random()*(i+1))|0,t=seq[i];seq[i]=seq[j];seq[j]=t;
-  }
-  var n=box.h<300?1:1+(Math.random()<.5?1:0);
-  var wrap=document.createElement('div');
-  wrap.className='blankm';wrap.setAttribute('aria-hidden','true');
-  wrap.style.cssText='left:'+box.l+'px;top:'+box.t+'px;width:'+box.w
-   +'px;height:'+box.h+'px';
-  for(var m2=0;m2<n;m2++){
-   var b=bands[m2%2];
-   var sp=document.createElement('span');
-   sp.style.cssText='left:'+(8+Math.random()*44).toFixed(1)+'%;top:'
-    +(b[0]+Math.random()*(b[1]-b[0])).toFixed(1)+'%;'
-    +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);'
-    +'opacity:'+(mode==='night'?'.85':'.65');
-   sp.appendChild(seq[m2%seq.length].cloneNode(true));
-   wrap.appendChild(sp);
-  }
-  sheet.appendChild(wrap);
+  var wrap2=document.createElement('div');
+  wrap2.className='blankm';wrap2.setAttribute('aria-hidden','true');
+  wrap2.style.cssText='left:'+last.offsetLeft+'px;top:'+(top+8)+'px;width:'
+   +Math.min(last.offsetWidth||480,Math.round(sheet.clientWidth/2))
+   +'px;height:'+(free-12)+'px';
+  deal(wrap2,free<280?1:1+(Math.random()<.5?1:0),[[2,26],[50,68]],free-24);
+  sheet.appendChild(wrap2);
  }
  /* the desk scatter: Div's motifs at RANDOM positions behind the notebook
     (day) or around the whole paint tool (whimsy — crayon set, denser than

@@ -1069,7 +1069,7 @@
    b.style.top=pts[i].y+'%';
    b.innerHTML=DOODLES[((DOODLE_OFF[sec.name]||0)+i)%DOODLES.length]+'<span></span>';
    b.querySelector('span').textContent=it.t;
-   b.addEventListener('click',function(){openProject(sec.name,it);});
+   b.addEventListener('click',function(){openProject(sec.name,it,d.items,i);});
   });
   /* connect-the-dots through the doodles' real pixel centres, so the line
      meets its drawings on every screen size */
@@ -1088,8 +1088,11 @@
   requestAnimationFrame(drawLine);
   window.addEventListener('resize',drawLine);
  }
- function openProject(secName,it){
-  state.view={type:'paper',sec:secName,title:it.t};
+ function openProject(secName,it,items,idx){
+  /* items/idx: the section's page list, so the paper's arrows can walk to the
+     previous/next project past the page edges — same logic as the book */
+  state.view={type:'paper',sec:secName,title:it.t,
+              nav:items?{sec:secName,items:items,idx:idx}:null};
   var seq=++state.seq;
   updateChrome();
   viewEl.innerHTML='<p class="whand wvload">opening '+it.t+'…</p>';
@@ -1132,15 +1135,27 @@
    if(pg>nP-1)pg=nP-1;
    place();
   }
+  function nb(d2){
+   var nav=state.view&&state.view.nav;
+   if(!nav||!nav.items)return null;
+   var ni=nav.idx+d2;
+   return (ni>=0&&ni<nav.items.length)?ni:null;
+  }
   function place(){
    inner.style.transform='translateX('+(-pg*(vis+32))+'px)';
    lbl.textContent='page '+(pg+1)+' of '+nP;
-   prev.disabled=pg<=0;
-   next.disabled=pg>=nP-1;
+   prev.disabled=pg<=0&&nb(-1)===null;
+   next.disabled=pg>=nP-1&&nb(1)===null;
   }
   function go(d2){
    var np=Math.max(0,Math.min(nP-1,pg+d2));
-   if(np===pg)return;
+   if(np===pg){
+    /* past the edge of this paper: walk to the neighbouring project, the way
+       the day book's page arrows do */
+    var nav=state.view&&state.view.nav,ni=nb(d2);
+    if(nav&&ni!==null)openProject(nav.sec,nav.items[ni],nav.items,ni);
+    return;
+   }
    pg=np;place();
   }
   paperGo=go;

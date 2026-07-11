@@ -128,7 +128,7 @@ html[data-mode="night"] .prose img{border-color:rgba(190,214,255,.4);background:
 html[data-mode="night"] .lightbox{background:rgba(3,4,10,.95)}
 /* the blank-page motif goes celestial: a crescent moon, fin., a shooting star */
 html[data-mode="night"] .endmotif{opacity:.8}
-html[data-mode="night"] .endmotif svg{display:none}
+html[data-mode="night"] .endmotif>svg{display:none}
 html[data-mode="night"] .endmotif::before{content:"";width:64px;height:76px;
  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 82'%3E%3Cpath d='M50 14 A28 28 0 1 0 50 68 A22 22 0 1 1 50 14 Z' fill='none' stroke='%235b74a8' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M16 20 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z' fill='%23aebdd8'/%3E%3Ccircle cx='60' cy='22' r='1.7' fill='%23aebdd8'/%3E%3C/svg%3E") center/contain no-repeat}
 html[data-mode="night"] .endmotif::after{content:"";width:90px;height:70px;

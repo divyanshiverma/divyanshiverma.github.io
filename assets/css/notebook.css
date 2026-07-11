@@ -92,7 +92,7 @@ clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%)}
 .sheet{grid-column:1/-1;padding:var(--pg-pad);column-count:2;column-gap:var(--spine);column-fill:auto;overflow:hidden;position:relative;min-width:0}
 .sheet table.idx{break-inside:avoid}
 /* end-of-piece motif — fills an otherwise blank right/bottom page (shown by notebook.js) */
-.endmotif{display:none;break-before:column;height:96%;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-6);opacity:.8}
+.endmotif{display:none;position:relative;break-before:column;height:96%;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-6);opacity:.8}
 /* handwritten page numbers (added by notebook.js) */
 .pgnum{position:absolute;bottom:var(--sp-4);font-family:'Satisfy',cursive;color:var(--soft);font-size:var(--fs-hand);z-index:4;pointer-events:none}
 .pgnum-l{left:var(--pg-pad)}
