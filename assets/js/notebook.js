@@ -477,6 +477,11 @@
   warmGen++;dropWarm();
   sheet.innerHTML=pl.sheetHTML;
   wrapImages();
+  /* the swapped-in sheet is virgin: re-deal the end-of-project motifs BEFORE
+     measuring (they are in-flow content) and before sheetB copies the sheet.
+     Missing this was why flip-arrived pieces had bare ends while direct
+     loads — and therefore every test — looked fine. */
+  endDeal();
   if(sheetB){sheetB.innerHTML=sheet.innerHTML;muteClone(sheetB);}
   measure();fixTables();measure();
   k=d==='next'?0:nSpreads-1;
