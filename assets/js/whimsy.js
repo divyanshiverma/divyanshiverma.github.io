@@ -187,8 +187,8 @@
  }
  function clearAll(){
   pushUndo();
+  ghostGone();
   cx.clearRect(0,0,cv.width,cv.height);
-  ghost=false;
   saveDrawing();
  }
  var saveT=null,lastSaveAt=0;
@@ -258,7 +258,17 @@
   Promise.all(jobs).then(function(){cb(out);});
  }
  window.__wExport=function(cb){exportCanvas(function(out){cb(out.toDataURL('image/png'));});};
- function ghostPaper(){
+ function ghostGone(){
+  /* Div's spec (whimsy V1, re-pinned Jul 12): the drawing-area motifs VANISH
+     the moment drawing starts. The white backing stays — only motifs go. */
+  if(!ghost)return;
+  ghost=false;
+  cx.clearRect(0,0,cv.width,cv.height);
+  var g=document.querySelector('.wghost');
+  if(g)[].slice.call(g.querySelectorAll('span')).forEach(function(x){x.remove();});
+  window.__wGhosts=0;
+ }
+ function ghostPaper(withMotifs){
   /* Div's crayon motifs scattered on the paper UNDER the drawing — always
      there (saved drawing or not), denser and more freely rotated than the
      day desk, re-dealt to fresh random spots every visit. The canvas rides
@@ -269,8 +279,9 @@
   if(old)old.remove();
   var layer=el('div','wghost');
   hold.insertBefore(layer,cv);
-  var pool=[].slice.call(document.querySelectorAll('.m svg.mw'));
   window.__wGhosts=0;
+  if(!withMotifs)return;                /* saved drawing: plain white paper */
+  var pool=[].slice.call(document.querySelectorAll('.m svg.mw'));
   if(!pool.length)return;
   for(var i=pool.length-1;i>0;i--){
    var j=(Math.random()*(i+1))|0,t=pool[i];pool[i]=pool[j];pool[j]=t;
@@ -377,7 +388,7 @@
    inp.remove();
    if(!v)return;
    pushUndo();
-   if(ghost){ghost=false;cx.clearRect(0,0,cv.width,cv.height);}
+   ghostGone();
    cx.fillStyle=fgCol;
    cx.font=(14+SIZES[sizeIdx]*4)+'px Satisfy,Georgia,serif';
    cx.fillText(v,px,py);
@@ -400,7 +411,7 @@
   var saved=null;
   try{saved=localStorage.getItem('dvPaint');}catch(e){}
   if(saved){ghost=false;restore(saved);}
-  ghostPaper();   /* the paper under the drawing is ALWAYS motif-scattered */
+  ghostPaper(!saved);   /* white paper always; motifs only on fresh paper */
   var down=false,px,py,startPt=null,base=null;
   /* select tool state (selRect.path set = free-form lasso selection) */
   var selRect=null,selCv=null,selMove=null,selStart=null,marquee=false,selBase=null;
@@ -514,7 +525,7 @@
    if(rbtn&&(tool==='select'||tool==='free'||tool==='poly'||tool==='curve'||tool==='text'))return;
    if(tool==='text'){textAt(p[0],p[1],e.clientX,e.clientY);return;}
    if(tool==='select'||tool==='free'){
-    if(ghost){ghost=false;cx.clearRect(0,0,cv.width,cv.height);}
+    ghostGone();
     if(inSel(p)){
      pushUndo();
      selCv=document.createElement('canvas');
@@ -542,7 +553,7 @@
     return;
    }
    if(tool==='poly'){
-    if(ghost){ghost=false;cx.clearRect(0,0,cv.width,cv.height);}
+    ghostGone();
     if(!polyPts.length){pushUndo();polySnap=cx.getImageData(0,0,cv.width,cv.height);polyPts.push(p);}
     else{
      var s=polyPts[0];
@@ -553,7 +564,7 @@
     return;
    }
    if(tool==='curve'){
-    if(ghost){ghost=false;cx.clearRect(0,0,cv.width,cv.height);}
+    ghostGone();
     if(curvePhase===0){pushUndo();curveSnap=cx.getImageData(0,0,cv.width,cv.height);curveA=p;curveB=p;}
     else if(curvePhase===1){curveC1=p;}
     else if(curvePhase===2){curveC2=p;}
@@ -561,7 +572,7 @@
     return;
    }
    pushUndo();
-   if(ghost){ghost=false;cx.clearRect(0,0,cv.width,cv.height);}
+   ghostGone();
    down=true;painting=true;
    drawCol=rbtn?bgCol:fgCol;
    px=p[0];py=p[1];startPt=p;
