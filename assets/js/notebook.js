@@ -718,11 +718,11 @@
    }
   });
  }
- /* Div's motifs on blank page space. Day: the quiet blank-page five (magic +
-    floral diagrams). Night: 1-2 celestial motifs, random order, ONLY in the
-    space left over after content in projects/posts (body.pg-piece) — never
-    sections, never the home sky, never margins. Whimsy paints its own paper. */
- function nightBlankMotifs(pool){
+ /* Div's motifs on the PROJECT-END blank page — and nowhere else ("blank
+    space refers to project end blank page, not everywhere!"). Day deals 1-2
+    of the quiet five; night deals 1-2 celestial; both random order, only on
+    body.pg-piece. Whimsy paints its own paper instead. */
+ function pieceBlankMotifs(pool,mode){
   if(!document.body.classList.contains('pg-piece')||!sheet)return;
   /* the space left over after a project's content, two shapes of it:
      a) content ended on an odd column -> the endmotif stretches over a whole
@@ -751,7 +751,7 @@
         h:useH-top-22};
    bands=[[4,30],[52,74]];
   }
-  var key='night:'+Math.round(box.l)+':'+Math.round(box.t)+':'+Math.round(box.h);
+  var key=mode+':'+Math.round(box.l)+':'+Math.round(box.t)+':'+Math.round(box.h);
   if(sheet.dataset.blankmKey===key)return;
   sheet.dataset.blankmKey=key;
   [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
@@ -769,7 +769,8 @@
    var sp=document.createElement('span');
    sp.style.cssText='left:'+(8+Math.random()*44).toFixed(1)+'%;top:'
     +(b[0]+Math.random()*(b[1]-b[0])).toFixed(1)+'%;'
-    +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);opacity:.85';
+    +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);'
+    +'opacity:'+(mode==='night'?'.85':'.65');
    sp.appendChild(seq[m2%seq.length].cloneNode(true));
    wrap.appendChild(sp);
   }
@@ -832,56 +833,7 @@
    pool=pool.filter(function(s){return five[s.getAttribute('aria-label')];});
   }
   if(!pool.length)return;
-  if(mode==='night'){nightBlankMotifs(pool);return;}
-  if(!sheet)return;
-  var cs=getComputedStyle(sheet);
-  var padL=parseFloat(cs.paddingLeft)||0,padT=parseFloat(cs.paddingTop)||0;
-  var padB=parseFloat(cs.paddingBottom)||0,gap=parseFloat(cs.columnGap)||0;
-  var kids=[].slice.call(sheet.children).filter(function(x){
-   return !x.classList.contains('blankm')&&!x.classList.contains('colspacer')
-          &&x.offsetHeight>0;
-  });
-  if(!kids.length)return;
-  var colW=0;
-  kids.forEach(function(x){colW=Math.max(colW,x.offsetWidth);});
-  if(colW<80)return;
-  var ncols=Math.max(1,Math.round((sheet.scrollWidth-padL*2+gap)/(colW+gap)));
-  var useH=sheet.clientHeight-padB;
-  var key=mode+':'+ncols+':'+Math.round(colW)+':'+Math.round(useH);
-  if(sheet.dataset.blankmKey===key)return;
-  sheet.dataset.blankmKey=key;
-  [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
-  var bottoms=[];
-  for(var c=0;c<ncols;c++)bottoms[c]=padT;
-  kids.forEach(function(x){
-   var c=Math.min(ncols-1,Math.max(0,Math.round((x.offsetLeft-padL)/(colW+gap))));
-   bottoms[c]=Math.max(bottoms[c],x.offsetTop+x.offsetHeight);
-  });
-  for(var ci=0;ci<ncols;ci++){
-   var free=useH-bottoms[ci];
-   if(free<160)continue;
-   var n=Math.min(mode==='night'?4:2,Math.floor(free/160));
-   if(n<1)continue;
-   var seq=pool.slice();
-   for(var i=seq.length-1;i>0;i--){
-    var j=(Math.random()*(i+1))|0,t=seq[i];seq[i]=seq[j];seq[j]=t;
-   }
-   var wrap=document.createElement('div');
-   wrap.className='blankm';wrap.setAttribute('aria-hidden','true');
-   wrap.style.cssText='left:'+(padL+ci*(colW+gap))+'px;width:'+colW+'px;top:'
-    +(bottoms[ci]+26)+'px;height:'+(free-32)+'px';
-   for(var m2=0;m2<n;m2++){
-    var sp=document.createElement('span');
-    sp.style.cssText='left:'+(6+Math.random()*52).toFixed(1)+'%;top:'
-     +(n>1?(m2*(82/n)+Math.random()*10):(Math.random()*36)).toFixed(1)+'%;'
-     +'transform:rotate('+(Math.random()*(mode==='night'?28:18)
-       -(mode==='night'?14:9)).toFixed(1)+'deg);'
-     +'opacity:'+(mode==='night'?'.85':'.6');
-    sp.appendChild(seq[m2%seq.length].cloneNode(true));
-    wrap.appendChild(sp);
-   }
-   sheet.appendChild(wrap);
-  }
+  pieceBlankMotifs(pool,mode);
  }
  function refresh(){
   fitScreen();
