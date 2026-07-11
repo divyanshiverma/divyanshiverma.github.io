@@ -186,10 +186,15 @@
   saveDrawing();
  }
  function clearAll(){
+  /* "erase everything" = back to blank paper, and blank paper wears its
+     motifs (Div): re-deal the ghosts; they vanish again on the next stroke.
+     Drop the saved drawing instead of saving a blank, so a reload also
+     opens as fresh motif paper. */
   pushUndo();
-  ghostGone();
   cx.clearRect(0,0,cv.width,cv.height);
-  saveDrawing();
+  ghost=true;
+  ghostPaper(true);
+  try{localStorage.removeItem('dvPaint');}catch(e){}
  }
  var saveT=null,lastSaveAt=0;
  function doSave(){
