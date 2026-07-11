@@ -258,15 +258,52 @@
   Promise.all(jobs).then(function(){cb(out);});
  }
  window.__wExport=function(cb){exportCanvas(function(out){cb(out.toDataURL('image/png'));});};
+ var ghostGen=0;
  function ghostMotifs(){
-  var kx=cv.width/1100,ky=cv.height/480;
-  cx.save();
-  cx.strokeStyle='rgba(50,18,122,.14)';cx.lineWidth=3;
-  cx.beginPath();cx.arc(230*kx,160*ky,40*Math.min(kx,ky),0,7);cx.stroke();
-  cx.beginPath();cx.moveTo(760*kx,330*ky);cx.quadraticCurveTo(830*kx,260*ky,900*kx,330*ky);cx.stroke();
-  cx.font=Math.round(40*Math.min(kx,ky))+'px serif';cx.fillStyle='rgba(183,32,37,.12)';
-  cx.fillText('❀',480*kx,220*ky);cx.fillText('✦',330*kx,390*ky);
-  cx.restore();
+  /* Div's crayon motifs scattered over the fresh paper — denser and more
+     freely rotated than the day desk; the first stroke sweeps them away. */
+  ghostGen++;
+  var pool=[].slice.call(document.querySelectorAll('.m svg.mw'));
+  if(!pool.length){
+   var kx=cv.width/1100,ky=cv.height/480;
+   cx.save();
+   cx.strokeStyle='rgba(50,18,122,.14)';cx.lineWidth=3;
+   cx.beginPath();cx.arc(230*kx,160*ky,40*Math.min(kx,ky),0,7);cx.stroke();
+   cx.beginPath();cx.moveTo(760*kx,330*ky);cx.quadraticCurveTo(830*kx,260*ky,900*kx,330*ky);cx.stroke();
+   cx.font=Math.round(40*Math.min(kx,ky))+'px serif';cx.fillStyle='rgba(183,32,37,.12)';
+   cx.fillText('❀',480*kx,220*ky);cx.fillText('✦',330*kx,390*ky);
+   cx.restore();
+   return;
+  }
+  for(var i=pool.length-1;i>0;i--){
+   var j=(Math.random()*(i+1))|0,t=pool[i];pool[i]=pool[j];pool[j]=t;
+  }
+  var gen=ghostGen,W=cv.width,H=cv.height;
+  var n=Math.max(16,Math.min(24,Math.round(W*H/38000)));
+  var cols=Math.ceil(Math.sqrt(n*W/Math.max(1,H))),rows=Math.ceil(n/cols);
+  window.__wGhosts=0;
+  for(var g=0;g<n;g++){
+   (function(g){
+    var s=pool[g%pool.length];
+    var w=parseFloat(s.getAttribute('width'))||90,h=parseFloat(s.getAttribute('height'))||90;
+    var img=new Image();
+    img.onload=function(){
+     if(!ghost||gen!==ghostGen)return;
+     var ci=g%cols,ri=(g/cols)|0;
+     var x=((ci+.15+Math.random()*.7)/cols)*W;
+     var y=((ri+.15+Math.random()*.7)/rows)*H;
+     var k=(0.8+Math.random()*0.8)*Math.min(W,H)/640;
+     cx.save();
+     cx.globalAlpha=.18;
+     cx.translate(x,y);cx.rotate(Math.random()*6.283);
+     cx.drawImage(img,-w*k/2,-h*k/2,w*k,h*k);
+     cx.restore();
+     window.__wGhosts++;
+    };
+    img.src='data:image/svg+xml;charset=utf-8,'
+     +encodeURIComponent(new XMLSerializer().serializeToString(s));
+   })(g);
+  }
  }
  function hexToRgb(h){
   h=h.replace('#','');
