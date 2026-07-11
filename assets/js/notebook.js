@@ -718,82 +718,11 @@
    }
   });
  }
- /* Div's motifs on the PROJECT-END blank page — and nowhere else ("blank
-    space refers to project end blank page, not everywhere!"). Day deals 1-2
-    of the quiet five; night deals 1-2 celestial; both random order, only on
-    body.pg-piece. Whimsy paints its own paper instead. */
- function pieceBlankMotifs(pool,mode){
-  if(!document.body.classList.contains('pg-piece')||!sheet)return;
-  function deal(wrap,n,bands,scaleH){
-   var seq=pool.slice();
-   for(var i=seq.length-1;i>0;i--){
-    var j=(Math.random()*(i+1))|0,t=seq[i];seq[i]=seq[j];seq[j]=t;
-   }
-   for(var m2=0;m2<n;m2++){
-    var b=bands[m2%bands.length];
-    var sp=document.createElement('span');
-    sp.style.cssText='left:'+(8+Math.random()*44).toFixed(1)+'%;top:'
-     +(b[0]+Math.random()*(b[1]-b[0])).toFixed(1)+'%;'
-     +'transform:rotate('+(Math.random()*24-12).toFixed(1)+'deg);'
-     +'opacity:'+(mode==='night'?'.85':'.65');
-    var svg=seq[m2%seq.length].cloneNode(true);
-    if(scaleH){
-     var sw=parseFloat(svg.getAttribute('width'))||90;
-     var sh=parseFloat(svg.getAttribute('height'))||80;
-     var f=Math.min(1,scaleH/sh);
-     if(f<1){svg.setAttribute('width',Math.round(sw*f));
-             svg.setAttribute('height',Math.round(sh*f));}
-    }
-    sp.appendChild(svg);
-    wrap.appendChild(sp);
-   }
-  }
-  /* content ended on an odd column: the endmotif fills the whole blank page.
-     Deal INSIDE it — measure() toggles its display every pass and pagination
-     slides the sheet, so an absolutely-placed sheet wrap would drift; a child
-     rides along for free. Its own art is centred; the bands stay clear. */
-  var em=sheet.querySelector('.endmotif');
-  if(em&&em.offsetHeight>170){
-   if(em.dataset.bmMode===mode&&em.querySelector('.blankm'))return;
-   em.dataset.bmMode=mode;
-   [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
-   var wrap=document.createElement('div');
-   wrap.className='blankm';wrap.setAttribute('aria-hidden','true');
-   wrap.style.cssText='left:0;top:0;width:100%;height:100%';
-   deal(wrap,1+(Math.random()<.5?1:0),
-        Math.random()<.5?[[5,20],[64,78]]:[[64,78],[5,20]]);
-   em.appendChild(wrap);
-   return;
-  }
-  /* content ended mid-column: the tail of the last column is the leftover.
-     Chrome (page arrows, the hidden endmotif itself) is not content. */
-  var kids=[].slice.call(sheet.children).filter(function(x){
-   return !x.classList.contains('blankm')&&!x.classList.contains('colspacer')
-          &&!x.classList.contains('pagenav')&&!x.classList.contains('pdfnote')
-          &&!x.classList.contains('endmotif')&&x.offsetHeight>0;
-  });
-  var last=kids[kids.length-1];
-  if(!last)return;
-  var cs=getComputedStyle(sheet);
-  var useH=sheet.clientHeight-(parseFloat(cs.paddingBottom)||0);
-  var nav=sheet.querySelector('.pagenav');
-  if(nav&&nav.offsetHeight&&Math.abs(nav.offsetLeft-last.offsetLeft)<last.offsetWidth)
-   useH=Math.min(useH,nav.offsetTop-8);
-  var top=last.offsetTop+last.offsetHeight;
-  var free=useH-top;
-  if(free<96)return;
-  var key=mode+':'+Math.round(last.offsetLeft)+':'+Math.round(top)+':'+Math.round(free);
-  if(sheet.dataset.blankmKey===key)return;
-  sheet.dataset.blankmKey=key;
-  [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
-  var wrap2=document.createElement('div');
-  wrap2.className='blankm';wrap2.setAttribute('aria-hidden','true');
-  wrap2.style.cssText='left:'+last.offsetLeft+'px;top:'+(top+8)+'px;width:'
-   +Math.min(last.offsetWidth||480,Math.round(sheet.clientWidth/2))
-   +'px;height:'+(free-12)+'px';
-  deal(wrap2,free<280?1:1+(Math.random()<.5?1:0),[[2,26],[50,68]],free-24);
-  sheet.appendChild(wrap2);
- }
+ /* the end-of-project deal: 1-2 of Div's motifs IN FLOW after the last
+    content of every piece (day = the quiet five, night = the celestial set,
+    random order each load). In-flow means it can never be swallowed by
+    layout: a full page just pushes it onto the next one. Sections, home and
+    whimsy papers never get it. */
  /* the desk scatter: Div's motifs at RANDOM positions behind the notebook
     (day) or around the whole paint tool (whimsy — crayon set, denser than
     day, any orientation), re-dealt every refresh. Night gets none. */
@@ -840,14 +769,14 @@
    boxes.push({l:x,t:y,r:x+mw,b:y+mh});
    placed++;
   }
-  desk.insertBefore(wrap,desk.firstChild);   // beneath the book, always
+  desk.insertBefore(wrap,desk.firstChild);   /* beneath the book, always */
  }
- function blankMotifs(){
+ function endDeal(){
+  if(!document.body.classList.contains('pg-piece')||!sheet)return;
   var mode=document.documentElement.getAttribute('data-mode')||'day';
-  if(mode==='whimsy'){
-   [].slice.call(document.querySelectorAll('.blankm')).forEach(function(x){x.remove();});
-   return;
-  }
+  if(mode==='whimsy')mode='day';          /* book is hidden there anyway */
+  var box=sheet.querySelector('.endm');
+  if(box&&box.dataset.mode===mode)return;
   var pool=[].slice.call(document.querySelectorAll('.m svg.'+(mode==='night'?'mn':'md')));
   if(mode!=='night'){
    var five={'blank-magic-1':1,'blank-magic-2':1,'blank-magic-3':1,
@@ -855,9 +784,34 @@
    pool=pool.filter(function(s){return five[s.getAttribute('aria-label')];});
   }
   if(!pool.length)return;
-  pieceBlankMotifs(pool,mode);
+  for(var i=pool.length-1;i>0;i--){
+   var j=(Math.random()*(i+1))|0,t=pool[i];pool[i]=pool[j];pool[j]=t;
+  }
+  if(!box){
+   box=document.createElement('div');
+   box.className='endm';box.setAttribute('aria-hidden','true');
+   var anchor=sheet.querySelector('.endmotif')||sheet.querySelector('.pagenav');
+   if(anchor)sheet.insertBefore(box,anchor);
+   else sheet.appendChild(box);
+  }
+  box.dataset.mode=mode;
+  box.innerHTML='';
+  var n=1+(Math.random()<.5?1:0);
+  for(var m2=0;m2<n;m2++){
+   var sp=document.createElement('span');
+   sp.style.transform='rotate('+(Math.random()*16-8).toFixed(1)+'deg)';
+   var svg=pool[m2%pool.length].cloneNode(true);
+   var sw=parseFloat(svg.getAttribute('width'))||90;
+   var sh=parseFloat(svg.getAttribute('height'))||80;
+   var f=Math.min(1,104/sh);
+   if(f<1){svg.setAttribute('width',Math.round(sw*f));
+           svg.setAttribute('height',Math.round(sh*f));}
+   sp.appendChild(svg);
+   box.appendChild(sp);
+  }
  }
  function refresh(){
+  endDeal();
   fitScreen();
   measure();
   fixTables();
@@ -866,7 +820,6 @@
   place();
   sizeVine();
   deskMotifs();
-  blankMotifs();
  }
  var pfDone={},pfText={},pfWait={};
  function prefetch(href){
@@ -986,13 +939,12 @@
    if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();go('next');}
   });
   window.addEventListener('resize',refresh);
-  /* mode flips re-deal the desk + blank-page motifs (fresh random each time) */
+  /* mode flips re-deal the desk + end-of-project motifs (fresh random each time) */
   new MutationObserver(function(){
-   if(sheet)delete sheet.dataset.blankmKey;
    var dk=document.querySelector('.desk');
    if(dk)delete dk.dataset.deskmKey;
    deskMotifs();
-   blankMotifs();
+   endDeal();
   }).observe(document.documentElement,{attributes:true,attributeFilter:['data-mode']});
   if(window.ResizeObserver&&sheet){var ro=new ResizeObserver(function(){refresh();});ro.observe(sheet);ro.observe(spread);}
   setTimeout(refresh,400);setTimeout(refresh,1200);

@@ -1120,7 +1120,7 @@
   var inner=el('div','wpinner wcontent',paper);
   var sheet=doc.querySelector('.sheet');
   inner.innerHTML=sheet?sheet.innerHTML:'<p>nothing here yet</p>';
-  inner.querySelectorAll('.endmotif,.colspacer,.pagenav,.takeaway,.zoombadge,.tape').forEach(function(x){x.remove();});
+  inner.querySelectorAll('.endmotif,.endm,.colspacer,.pagenav,.takeaway,.zoombadge,.tape').forEach(function(x){x.remove();});
   var nav=el('div','wpnav',paper);
   var prev=el('button','wparr',nav);
   prev.type='button';prev.textContent='‹';prev.setAttribute('aria-label','previous page');
