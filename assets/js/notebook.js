@@ -736,19 +736,25 @@
    box={l:em.offsetLeft,t:em.offsetTop,w:em.offsetWidth,h:em.offsetHeight};
    bands=Math.random()<.5?[[6,20],[64,78]]:[[64,78],[6,20]];
   }else{
+   /* chrome (page arrows etc.) is NOT content — counting it used to swallow
+      the leftover space on most projects, so their ends stayed bare */
    var kids=[].slice.call(sheet.children).filter(function(x){
     return !x.classList.contains('blankm')&&!x.classList.contains('colspacer')
+           &&!x.classList.contains('pagenav')&&!x.classList.contains('pdfnote')
            &&x.offsetHeight>0;
    });
    var last=kids[kids.length-1];
    if(!last)return;
    var cs=getComputedStyle(sheet);
    var useH=sheet.clientHeight-(parseFloat(cs.paddingBottom)||0);
+   var nav=sheet.querySelector('.pagenav');
+   if(nav&&nav.offsetHeight&&Math.abs(nav.offsetLeft-last.offsetLeft)<last.offsetWidth)
+    useH=Math.min(useH,nav.offsetTop-8);
    var top=last.offsetTop+last.offsetHeight;
-   if(useH-top<170)return;
-   box={l:last.offsetLeft,t:top+14,
+   if(useH-top<100)return;
+   box={l:last.offsetLeft,t:top+12,
         w:Math.min(last.offsetWidth||480,Math.round(sheet.clientWidth/2)),
-        h:useH-top-22};
+        h:useH-top-18};
    bands=[[4,30],[52,74]];
   }
   var key=mode+':'+Math.round(box.l)+':'+Math.round(box.t)+':'+Math.round(box.h);
@@ -759,7 +765,7 @@
   for(var i=seq.length-1;i>0;i--){
    var j=(Math.random()*(i+1))|0,t=seq[i];seq[i]=seq[j];seq[j]=t;
   }
-  var n=box.h<340?1:1+(Math.random()<.5?1:0);
+  var n=box.h<300?1:1+(Math.random()<.5?1:0);
   var wrap=document.createElement('div');
   wrap.className='blankm';wrap.setAttribute('aria-hidden','true');
   wrap.style.cssText='left:'+box.l+'px;top:'+box.t+'px;width:'+box.w
@@ -776,9 +782,9 @@
   }
   sheet.appendChild(wrap);
  }
- /* the desk scatter: a handful of Div's motifs at RANDOM positions behind the
-    notebook, re-dealt every refresh. Day only — night is blank-pages-only,
-    and whimsy scatters its own paper (whimsy.js ghostPaper). */
+ /* the desk scatter: Div's motifs at RANDOM positions behind the notebook
+    (day) or around the whole paint tool (whimsy — crayon set, denser than
+    day, any orientation), re-dealt every refresh. Night gets none. */
  function deskMotifs(){
   var mode=document.documentElement.getAttribute('data-mode')||'day';
   var desk=document.querySelector('.desk');
@@ -788,14 +794,16 @@
   if(desk.dataset.deskmKey===key)return;
   desk.dataset.deskmKey=key;
   [].slice.call(document.querySelectorAll('.deskm')).forEach(function(x){x.remove();});
-  if(mode!=='day')return;
-  var pool=[].slice.call(document.querySelectorAll('.m svg.md'));
+  if(mode==='night')return;
+  var pool=[].slice.call(document.querySelectorAll(
+   '.m svg.'+(mode==='whimsy'?'mw':'md')));
   if(!pool.length||W<400||H<300)return;
   for(var i=pool.length-1;i>0;i--){
    var j=(Math.random()*(i+1))|0,t=pool[i];pool[i]=pool[j];pool[j]=t;
   }
-  var base=Math.round(W*H/160000);
-  var n=Math.max(6,Math.min(10,base));
+  var base=Math.round(W*H/90000);
+  var n=mode==='whimsy'?Math.max(20,Math.min(28,Math.round(base*1.7)))
+                       :Math.max(12,Math.min(18,base));
   var wrap=document.createElement('div');
   wrap.className='deskm';wrap.setAttribute('aria-hidden','true');
   var boxes=[],placed=0;
@@ -805,14 +813,16 @@
    var mh=parseFloat(s.getAttribute('height'))||80;
    if(W<mw+24||H<mh+24)break;
    var x=8+Math.random()*(W-mw-16),y=8+Math.random()*(H-mh-16);
-   var pad=26;
+   var pad=mode==='whimsy'?10:18;
    var hit=boxes.some(function(b){
     return x<b.r+pad&&x+mw>b.l-pad&&y<b.b+pad&&y+mh>b.t-pad;
    });
    if(hit)continue;
    var sp=document.createElement('span');
+   var rot=mode==='whimsy'?(Math.random()*360).toFixed(0)
+                          :(Math.random()*18-9).toFixed(1);
    sp.style.cssText='left:'+Math.round(x)+'px;top:'+Math.round(y)+'px;'
-    +'transform:rotate('+(Math.random()*18-9).toFixed(1)+'deg)';
+    +'transform:rotate('+rot+'deg)';
    sp.appendChild(s.cloneNode(true));
    wrap.appendChild(sp);
    boxes.push({l:x,t:y,r:x+mw,b:y+mh});

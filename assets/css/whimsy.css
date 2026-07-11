@@ -116,8 +116,14 @@ html[data-mode="whimsy"] body.pg-home .bookwrap{visibility:hidden}
 .wview .wcontent h1,.wview .wcontent h2,.wview .wcontent h3{font-family:'Fraunces',Georgia,serif;color:#1D1615}
 .wview .wcontent h1{font-size:1.3rem;margin:0 0 .6rem}
 .wview .wcontent h2{font-size:1.02rem;margin:.9rem 0 .4rem}
-.wview .wcontent p{font-size:.88rem;line-height:1.65;color:#3a352b;margin:0 0 .6rem}
+.wview .wcontent p{font-size:.88rem;line-height:1.65;color:#3a352b;margin:0 0 .6rem;
+ max-width:none!important}
 .wview .wcontent img{max-width:100%;height:auto;border:1px solid #1D1615}
+/* the about photo rides the right edge and the text WRAPS around it — no more
+   half-empty page with the copy cut mid-sentence (Div, Jul 11) */
+.wview .wcontent .photo{float:right;margin:0 0 14px 26px!important;
+ transform:rotate(1.5deg)}
+.wview .wcontent table,.wview .wcontent h2{clear:both}
 .wview .wcontent table{font-size:.78rem}
 .wview .wcontent .endmotif,.wview .wcontent .pagenav{display:none}
 .wtray{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
