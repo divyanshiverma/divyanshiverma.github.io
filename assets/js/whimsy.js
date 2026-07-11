@@ -133,7 +133,9 @@
  }
  function motifSvgs(){
   var seen={},out=[];
-  document.querySelectorAll('.m svg').forEach(function(s){
+  var picks=document.querySelectorAll('.m svg.mw');
+  if(!picks.length)picks=document.querySelectorAll('.m svg');
+  picks.forEach(function(s){
    var k=s.innerHTML.replace(/\s+/g,'');
    if(seen[k])return;
    seen[k]=1;out.push(s);
