@@ -1,6 +1,6 @@
 /* notebook.js — notebook pagination + leaflet page-flip navigation */
 (function(){
- var ORDER=['index.html','works.html','project/fadedtofresh.html','project/kyakhaya.html','project/ricezero.html','project/casualkurta.html','project/forgetthetools.html','project/passiontodream.html','project/fluentmint.html','project/callyourcode.html','project/reelgenai.html','project/robotbonsai.html','project/shalu.html','project/shikherverma.html','project/lktechnology.html','project/benzeneai.html','project/commuterglasses.html','project/typescriptnotebook.html','project/zrpl.html','project/ludo-naira.html','project/blitz.html','project/commuter-glasses-marketing.html','about.html'];
+ var ORDER=['index.html','works.html','project/fadedtofresh.html','project/kyakhaya.html','project/ricezero.html','project/casualkurta.html','project/forgetthetools.html','project/passiontodream.html','project/fluentmint.html','project/callyourcode.html','project/reelgenai.html','project/robotbonsai.html','project/shalu.html','project/shikherverma.html','project/lktechnology.html','project/benzeneai.html','project/commuterglasses.html','project/typescriptnotebook.html','project/zrpl.html','project/ludo-naira.html','project/blitz.html','about.html'];
  var spread,sheet,sheetB,vp,vpT,vpB,vine,hintUp,hintDn,pgL,pgR;
  var prevHref=null,nextHref=null;
  var small=window.matchMedia('(max-width:940px),(max-height:520px) and (pointer:coarse)');
