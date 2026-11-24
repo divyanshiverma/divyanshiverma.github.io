@@ -398,3 +398,66 @@ html[data-mode="night"] body.pg-about .bookwrap{visibility:hidden}
  html[data-mode="night"] .starnav a{font-size:.875rem}
  html[data-mode="night"] .sky-intro p{font-size:.9375rem}
 }
+/* night: phone mockups glow along their own outline, never on a white card */
+html[data-mode="night"] .prose img.device{background:none;border:none}
+html[data-mode="night"] .zoomwrap img.device{box-shadow:none;filter:drop-shadow(0 0 12px rgba(160,195,255,.35))}
+/* Home · Works · About (Nov 2026): About is a lone star beside the intro text,
+   Works is one constellation of chapters under it */
+/* top right of the hero, its top level with the top of the photo (Div, Nov 21) */
+.sky-aboutstar{position:absolute;top:-1.25rem;right:5%;display:flex;flex-direction:column;align-items:center;gap:.125rem;
+ text-decoration:none}
+.sky-aboutstar .star{fill:#eef2ff;filter:drop-shadow(0 0 6px rgba(220,232,255,.9))}
+.sky-aboutstar .glint{stroke:#dfe8ff}
+.sky-aboutstar span{font-family:Georgia,serif;font-style:italic;font-size:1.15rem;letter-spacing:.03em;color:#8298bf}
+.sky-aboutstar:hover span,.sky-aboutstar:focus-visible span{color:#f2f6ff}
+.home-sky .works-chart .starlabel{fill:#cdd8ff;font-family:Georgia,serif;font-style:italic;font-size:14px;
+ letter-spacing:.01em}
+.home-sky .works-chart a:hover .starlabel,.home-sky .works-chart a:focus-visible .starlabel{fill:#fff}
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ html[data-mode="night"] .sky-aboutstar{display:none}  /* phones: About is in the star list below */
+}
+@media(max-width:1120px){.sky-aboutstar{right:1.25%}}  /* clear of the intro text on narrower desktops */
+/* Eridanus: the in-between river stars stay small; background figures sit far back */
+.home-sky .works-chart .dimstar{opacity:.55}
+/* background figures: a full-screen layer behind the sky, edges of the SCREEN */
+.bgfigs{display:none}
+html[data-mode="night"] .bgfigs{display:block;position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.bgfigs .bgfig{position:absolute;height:auto;overflow:visible}
+.bgfigs .bgline{stroke:#cdd8ff;stroke-width:.8;opacity:.12}   /* dimmed by 40/55 (Div, Nov 22) */
+.bgfigs .bgstar{fill:#dfe8ff;opacity:.3}
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ html[data-mode="night"] .bgfigs{display:none}
+}
+/* piece pages: the star nav keeps the same breathing room under the top bar as sections */
+html[data-mode="night"] body.pg-piece .starnav{margin-top:.875rem}
+/* sky pages: the name line sits right at the bottom of the screen (Div, Nov 22) */
+html[data-mode="night"] body.has-sky main.desk{padding-bottom:.375rem}
+html[data-mode="night"] body.has-sky .colophon{padding-bottom:.625rem}
+/* ---- Works on phones (Div, Nov 22) ---- */
+@media(max-width:940px),(max-height:520px) and (pointer:coarse){
+ /* home: About = one star under the intro, Works = the river below it, one screen, no scroll */
+ html[data-mode="night"] body.has-sky .home-sky ~ .colophon,html[data-mode="night"] body.pg-home main.desk{padding-top:.875rem}
+ html[data-mode="night"] .home-sky .sky-intro{padding:.375rem .125rem .25rem}
+ html[data-mode="night"] .home-sky .sky-list.sky-list-works{gap:.75rem;padding:.75rem .75rem .5rem}
+ html[data-mode="night"] .home-sky .sky-list-works a.item{align-self:center!important}
+ html[data-mode="night"] .home-sky .sky-list-works a.about-item{align-self:flex-end!important;margin-right:1.25rem;
+  width:fit-content;min-width:0}
+ html[data-mode="night"] .home-sky .sky-list-works a.about-item .t{flex:none;width:auto}
+ html[data-mode="night"] .home-sky .sky-list-works a.about-item .g svg{width:2.5rem}
+ html[data-mode="night"] .home-sky .sky-list-works a.about-item small{display:none}
+ html[data-mode="night"] .home-sky .sky-list-works a.works-item{margin-top:.5rem}
+ html[data-mode="night"] .home-sky .sky-list-works a.works-item .g svg{width:min(19rem,80vw);max-height:19dvh}
+ html[data-mode="night"] .home-sky .sky-photo{width:min(10.5rem,13dvh)}
+ html[data-mode="night"] .home-sky .sky-photo img,html[data-mode="night"] .home-sky .sky-photo .ph{height:min(10.5rem,13dvh)}
+ html[data-mode="night"] body.has-sky .colophon{padding-top:.625rem}
+ /* works page: numbered river + list */
+ .works-m .starnum{fill:#cdd8ff;font-family:Georgia,serif;font-style:italic;font-size:15px}
+ .works-list{list-style:none;margin:1rem 0 0;padding:0 .25rem;display:flex;flex-direction:column}
+ .works-list a{display:flex;align-items:baseline;gap:.75rem;padding:.6rem .25rem;border-bottom:1px solid rgba(140,170,230,.16);
+  color:#dbe4f8;text-decoration:none;font-family:Georgia,serif}
+ .works-list i{color:#8298bf;min-width:1.5rem;font-style:italic}
+ .works-list b{font-weight:400;flex:1}
+ .works-list small{color:#6f81a6;font-style:italic}
+}
+/* Works page, desktop: the river gets the wider column (Div, Nov 22) */
+@media(min-width:941px){html[data-mode="night"] .sky.sky-section.works-sky{grid-template-columns:.8fr 1.2fr;gap:2.5rem}}

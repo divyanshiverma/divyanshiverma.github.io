@@ -1,12 +1,12 @@
 /* notebook.js — notebook pagination + leaflet page-flip navigation */
 (function(){
- var ORDER=['index.html','marketing.html','project/marketing-01.html','project/marketing-02.html','project/marketing-03.html','design.html','project/design-01.html','project/design-02.html','project/design-03.html','project/design-04.html','blog.html','post/blog-01.html','post/blog-02.html','post/blog-03.html','post/blog-04.html','about.html'];
+ var ORDER=['index.html','works.html','project/fadedtofresh.html','project/kyakhaya.html','project/ricezero.html','project/casualkurta.html','project/forgetthetools.html','project/passiontodream.html','project/fluentmint.html','project/callyourcode.html','project/reelgenai.html','project/robotbonsai.html','project/shalu.html','project/shikherverma.html','project/lktechnology.html','project/benzeneai.html','project/commuterglasses.html','project/typescriptnotebook.html','project/zrpl.html','project/ludo-naira.html','project/blitz.html','project/commuter-glasses-marketing.html','about.html'];
  var spread,sheet,sheetB,vp,vpT,vpB,vine,hintUp,hintDn,pgL,pgR;
  var prevHref=null,nextHref=null;
  var small=window.matchMedia('(max-width:940px),(max-height:520px) and (pointer:coarse)');
  var reduced={matches:false}; /* Div's call: the book turns for everyone */
  var ZOOM=1;
- var k=0,nSpreads=1,unit=0,busy=false,mobile=false,single=false,stickEnd=false,orderIdx=0,isPiece=false,lb=null;
+ var k=0,nSpreads=1,unit=0,busy=false,mobile=false,single=false,stickEnd=false,hashK=null,orderIdx=0,isPiece=false,lb=null;
 
  function lightbox(src,alt){
   if(!lb){
@@ -92,6 +92,7 @@
   document.body.classList.remove('bw-fit');
   var skyEl=document.querySelector('.sky');
   if(skyEl)skyEl.style.zoom='';
+  var col0=document.querySelector('.colophon');if(col0)col0.style.marginTop='';
   if(document.documentElement.getAttribute('data-mode')==='whimsy'&&document.body.classList.contains('has-whimsy'))return;
   if(mobile&&single&&!isNight())return;
   /* landscape phones: fitting would make the book unreadably small; scroll instead */
@@ -108,6 +109,9 @@
    var sz=(window.innerHeight-sTop-sBelow-6)/sh;
    sz=Math.min(1,Math.max(0.25,sz));
    if(sz<0.995)skyEl.style.zoom=sz;
+   /* the name line belongs at the bottom of the screen: give it the leftover height */
+   var colEl=document.querySelector('.colophon');
+   if(colEl){var lo=window.innerHeight-document.body.scrollHeight;if(lo>0)colEl.style.marginTop=lo+'px';}
    return;
   }
   function calc(){
@@ -394,7 +398,7 @@
   mkWash(d);
   var lo=mkWashOld('wash-old '+(mobile?'v ':'')+(d==='next'?'nwo-next':'nwo-prev'),-(single?1:2)*k*unit);
   if(d==='next')k++;else k--;
-  stickEnd=false;place();
+  stickEnd=false;hashK=null;place();
   setTimeout(function(){lo.remove();busy=false;},830);
  }
  function deskFlip(d){
@@ -415,7 +419,7 @@
   function finish(){
    if(done)return;done=true;
    if(out)k++;else k--;
-   stickEnd=false;place();
+   stickEnd=false;hashK=null;place();
    lf.remove();under.remove();cast.remove();
    spread.classList.remove('persp');
    busy=false;
@@ -429,7 +433,7 @@
   setTimeout(function(){
    outEl.classList.remove('m-out-next','m-out-prev');
    if(d==='next')k++;else k--;
-   stickEnd=false;place();
+   stickEnd=false;hashK=null;place();
    inEl.classList.add(d==='next'?'m-in-next':'m-in-prev');
    setTimeout(function(){inEl.classList.remove('m-in-next','m-in-prev');busy=false;},350);
   },265);
@@ -439,10 +443,14 @@
   /* only the night sky replaces the book; in day these pages are normal spreads */
   if(document.body.classList.contains('has-sky')&&isNight())return false;
   if(mobile&&!single&&!spread.classList.contains('mbook'))return false;
+  /* phones in the single-page layout (home) have no split viewports for the in-place
+     swap: turning from there used to throw and lock the book (Nov 22 2026), so they
+     take the normal page load, which still plays the arrival turn */
+  if(mobile&&!vpB)return false;
   if(isNight()){
    var bn=href.split('#')[0].split('?')[0].split('/').pop();
    if(bn&&bn.indexOf('.')<0)bn+='.html';
-   if(bn===''||bn==='index.html'||bn==='marketing.html'||bn==='design.html'||bn==='blog.html'||bn==='about.html')return false;
+   if(bn===''||bn==='index.html'||bn==='works.html'||bn==='marketing.html'||bn==='design.html'||bn==='blog.html'||bn==='about.html')return false;
   }
   return true;
  }
@@ -469,7 +477,7 @@
   document.body.classList.add(
    bn==='index.html'?'pg-home':
    bn==='about.html'?'pg-about':
-   (bn==='marketing.html'||bn==='design.html'||bn==='blog.html')?'pg-section':'pg-piece');
+   (bn==='works.html'||bn==='marketing.html'||bn==='design.html'||bn==='blog.html')?'pg-section':'pg-piece');
   prefetch(prevHref);prefetch(nextHref);
   try{window.dispatchEvent(new Event('nb:navigated'));}catch(e){}
  }
@@ -485,7 +493,7 @@
   if(sheetB){sheetB.innerHTML=sheet.innerHTML;muteClone(sheetB);}
   measure();fixTables();measure();
   k=d==='next'?0:nSpreads-1;
-  stickEnd=false;
+  stickEnd=false;hashK=null;
   place();
   window.scrollTo(0,0);
  }
@@ -601,7 +609,15 @@
    return;
   }
   if(mobile){
-   var el=spread.classList.contains('mbook')?(d==='next'?vpB:vpT):spread;
+   if(!spread.classList.contains('mbook')){
+    /* the single-page phone layout (home) has no halves. Folding the WHOLE page skewed
+       it (Div, Nov 22: "not flipping the same way other pages do"), so fold just the
+       visible half, over plain paper, the way every split page folds */
+    foldHalf(d);
+    setTimeout(function(){location.href=href;},290);
+    return;
+   }
+   var el=d==='next'?vpB:vpT;
    el.classList.add(d==='next'?'m-out-next':'m-out-prev');
    setTimeout(function(){location.href=href;},290);
   }else if(sheet){
@@ -614,6 +630,27 @@
    setTimeout(function(){location.href=href;},320);
   }
  }
+ function foldHalf(d){
+  var r=spread.getBoundingClientRect();
+  var top=Math.max(r.top,0),bot=Math.min(r.bottom,window.innerHeight),mid=Math.round((top+bot)/2);
+  var y0=d==='next'?mid:top,y1=d==='next'?bot:mid;
+  if(y1-y0<10)return;
+  var bg=getComputedStyle(spread).backgroundColor||'#fffdf7';
+  function box(z){
+   var b=document.createElement('div');
+   b.style.cssText='position:fixed;left:'+r.left+'px;width:'+r.width+'px;top:'+y0+'px;height:'+(y1-y0)+
+    'px;overflow:hidden;z-index:'+z+';pointer-events:none;background:'+bg;
+   document.body.appendChild(b);
+   return b;
+  }
+  box(60);                                  /* plain paper where the half lifts off */
+  var leaf=box(61);
+  var c=spread.cloneNode(true);
+  muteClone(c);
+  c.style.cssText='position:absolute;left:0;top:'+(r.top-y0)+'px;width:'+r.width+'px;margin:0';
+  leaf.appendChild(c);
+  leaf.classList.add(d==='next'?'m-out-next':'m-out-prev');
+ }
  function go(d){
   if(busy)return;
   var intra=!!sheet&&(d==='next'?k<nSpreads-1:k>0);
@@ -622,7 +659,7 @@
   busy=true;
   if(reduced.matches&&intra){
    if(d==='next')k++;else k--;
-   stickEnd=false;place();busy=false;return;
+   stickEnd=false;hashK=null;place();busy=false;return;
   }
   if(intra){if(isNight()&&sheet)washFlip(d);else mobile?mobFlip(d):deskFlip(d);}
   else leave(d);
@@ -884,6 +921,7 @@
   fixTables();
   measure();
   if(stickEnd)k=nSpreads-1;
+  else if(hashK!==null)k=Math.min(hashK,nSpreads-1);
   place();
   sizeVine();
   deskMotifs();
@@ -926,7 +964,9 @@
   var dir=null;
   try{dir=sessionStorage.getItem('nbFlip');sessionStorage.removeItem('nbFlip');}catch(e){}
   var mh=location.hash.match(/^#p(\d+)$/);
-  if(mh)k=Math.min(Math.max(0,parseInt(mh[1],10)-1),nSpreads-1);
+  /* a #pN deep link is HELD until the reader turns: the first measure runs before
+     images get their mats, so a long piece can measure short and clamp too early */
+  if(mh){hashK=Math.max(0,parseInt(mh[1],10)-1);k=Math.min(hashK,nSpreads-1);}
   if(dir==='prev'){k=nSpreads-1;stickEnd=true;}
   if(dir==='next')k=0;
   place();

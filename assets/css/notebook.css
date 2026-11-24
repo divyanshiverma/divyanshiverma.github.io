@@ -352,3 +352,7 @@ transform:translateX(-50%);border:5px solid transparent;border-bottom-color:var(
    book is height-fitted (hiding them here is why Div saw a bare day desk). */
 .bw-fit .desk{padding-top:.75rem;padding-bottom:.75rem}
 .bw-fit .colophon{padding:.375rem 0 .625rem}
+/* device mockups (transparent phone frames): no polaroid mat, the frame is the object */
+.zoomwrap:has(img.device){background:none;border:none;box-shadow:none;padding:0 0 .5rem}
+.zoomwrap:has(img.device) .tape{display:none}
+.prose img.device{background:none;border:none}

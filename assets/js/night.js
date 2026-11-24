@@ -216,6 +216,8 @@
   setTimeout(function(){location.href=href;},450);
  }
 
+ /* real constellation figures, baked by tools/build_sky_figures.py */
+ /*SKYFIG*/var SKYFIG={"Eri":{"w":0.8749,"h":1.0,"lines":[[[-0.4375,-0.4661],[-0.3444,-0.5],[-0.3062,-0.4982],[-0.2044,-0.4336],[-0.1468,-0.3101],[-0.0973,-0.3361],[-0.0852,-0.3794],[-0.0423,-0.3851],[0.1097,-0.3955],[0.161,-0.3036],[0.1569,-0.2162],[0.0849,-0.1227],[0.0136,-0.1572],[-0.0458,-0.1596],[-0.1002,-0.1296],[-0.303,0.0059],[-0.255,0.0699],[-0.2295,0.0658],[-0.1111,0.1103],[-0.0596,0.1858],[0.0119,0.2376],[0.1021,0.1863],[0.1754,0.178],[0.2323,0.3234],[0.2759,0.394],[0.3615,0.3957],[0.4375,0.5]]]},"Ori":{"w":0.681,"h":1.0,"lines":[[[-0.3043,-0.3161],[-0.1949,-0.5],[-0.274,-0.4954],[-0.3405,-0.2974],[-0.2612,-0.1451],[-0.2014,-0.0703],[0.0478,-0.0349],[0.2986,-0.1619]],[[0.2683,0.1199],[0.3039,0.0956],[0.3292,-0.0101],[0.3405,-0.0554],[0.3341,-0.1201],[0.2986,-0.1619],[0.2863,-0.2742],[0.2183,-0.3373],[0.1758,-0.3438]],[[0.1356,0.451],[0.0532,0.2571],[-0.0093,0.1871],[0.0478,-0.0349],[-0.0352,-0.1546],[-0.2014,-0.0703],[-0.0819,0.242],[-0.1399,0.5]],[[-0.0819,0.242],[-0.0442,0.2172],[-0.0093,0.1871]]]},"Cap":{"w":1.0,"h":0.6784,"lines":[[[0.5,-0.3392],[0.4624,-0.2322],[0.3746,-0.0894],[0.1818,0.2616],[0.1177,0.3392],[-0.2721,0.127],[-0.5,-0.1688],[-0.4223,-0.1436],[-0.2226,-0.1355],[-0.0403,-0.1168],[0.5,-0.3392]]]},"Lib":{"w":0.5528,"h":1.0,"lines":[[[0.1238,0.2796],[0.2764,-0.1735],[-0.0259,-0.5],[-0.2402,-0.2349],[-0.2575,0.4195],[-0.2764,0.5]],[[0.2764,-0.1735],[-0.2402,-0.2349]]]},"UMa":{"w":1.0,"h":0.6392,"lines":[[[-0.2097,-0.1974],[0.0163,-0.293],[0.0223,-0.1842],[-0.1416,-0.1297],[-0.2097,-0.1974],[-0.3313,-0.1756],[-0.4256,-0.1547],[-0.5,-0.0409]],[[-0.1416,-0.1297],[-0.1171,-0.0098],[-0.0302,0.2879],[-0.0293,0.3196]],[[-0.1171,-0.0098],[-0.0024,0.0567],[0.1468,0.1175]],[[-0.0024,0.0567],[0.1633,0.0888]],[[0.0163,-0.293],[0.3069,-0.3196],[0.5,-0.2721],[0.2456,-0.2381],[0.0223,-0.1842]],[[0.0223,-0.1842],[0.242,-0.1372],[0.3027,-0.0888],[0.4088,-0.0151]],[[0.3949,0.0028],[0.3027,-0.0888]]]},"Cet":{"w":1.0,"h":0.6909,"lines":[[[-0.3835,-0.1763],[-0.3379,-0.2343],[-0.2905,-0.3048],[-0.3935,-0.3455],[-0.4843,-0.3158],[-0.5,-0.1973],[-0.3835,-0.1763],[-0.36,-0.1049],[-0.2364,-0.0236],[-0.0651,0.1573],[-0.0197,0.2951],[0.3516,0.3455],[0.5,0.1202],[0.1981,0.1536],[0.1033,0.1044],[-0.0651,0.1573]]]},"Hya":{"w":1.0,"h":0.4385,"lines":[[[0.4755,-0.2192],[0.4711,-0.2129],[0.4851,-0.1864],[0.497,-0.1858],[0.5,-0.2115],[0.4755,-0.2192],[0.4524,-0.2141],[0.4015,-0.1746],[0.3331,-0.137],[0.366,-0.0553],[0.3019,0.012],[0.2506,-0.0151],[0.209,0.0336],[0.1458,0.0266],[0.0294,0.1969],[-0.024,0.2192],[-0.2548,0.1025],[-0.3821,0.1407],[-0.5,0.1546]]]}};/*ENDSKYFIG*/
  /* ---------- home sky ---------- */
  function readHome(){
   var scope=document.querySelector('.spread .sheet')||document;
@@ -277,11 +279,27 @@
   });
   intro.appendChild(t);
   sky.appendChild(intro);
+  /* Home · Works · About (Div, Nov 21 2026): ONE constellation of chapters, and About
+     as a lone star in the open sky beside the intro. The chapters ride along in the
+     home page as #dv-works (written by build_launch.py). */
+  var worksData=null;
+  try{var wj=document.getElementById('dv-works');if(wj)worksData=JSON.parse(wj.textContent);}catch(e){}
+  if(worksData&&worksData.length){
+   var aboutSec=data.sections.filter(function(s){return /about/i.test(s.name);})[0];
+   aboutStar(intro,aboutSec?aboutSec.href:'about.html');
+   bgFigures();
+   worksSky(sky,worksData);
+   buildHomeList(sky,data);
+   return;
+  }
   /* then the constellations, spread across the same sky */
   var svg=el('svg',{viewBox:'0 0 '+W+' '+H,'class':'chart',role:'img',
    'aria-label':'The night sky. Each constellation is a section of the site.'});
   bgStars(el('g',null,svg),'homesky',60,W,H);
-  var spots={Marketing:[170,300],Design:[475,190],Blog:[820,330],About:[1080,190]};
+  /* three constellations since the blog left (Nov 2026); the four-section layout stays for the master tree */
+  var hasBlog=data.sections.some(function(s){return s.name==='Blog';});
+  var spots=hasBlog?{Marketing:[170,300],Design:[475,190],Blog:[820,330],About:[1080,190]}
+   :{Marketing:[220,320],Design:[620,250],About:[1010,300]};
   var fall=[[170,300],[475,190],[820,330],[1080,190]];
   data.sections.forEach(function(s,i){
    var c=spots[s.name]||fall[i%4];
@@ -305,13 +323,182 @@
   sky.appendChild(svg);
   buildHomeList(sky,data);
  }
+ function aboutStar(intro,href){
+  var a=document.createElement('a');
+  a.className='sky-aboutstar';a.href=href;
+  a.setAttribute('aria-label','About me');
+  a.innerHTML='<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">'+
+   '<circle cx="23" cy="23" r="3.6" class="star"/>'+
+   '<path d="M23 9 V37 M9 23 H37" class="glint" stroke-width=".8"/>'+
+   '<path d="M15 15 L31 31 M31 15 L15 31" class="glint" stroke-width=".5" opacity=".55"/></svg>'+
+   '<span>About</span>';
+  if(!reduced.matches){
+   a.addEventListener('click',function(e){
+    if(current()!=='night')return;
+    e.preventDefault();
+    zoomLeave(a,href,'in');
+   });
+  }
+  intro.appendChild(a);
+  /* level with the name (Div, Nov 22): the star's centre sits on the h1's middle */
+  function level(){
+   var h=intro.querySelector('h1');
+   if(!h||!a.isConnected)return;
+   a.style.top=(h.offsetTop+h.offsetHeight/2-23)+'px';
+  }
+  requestAnimationFrame(level);
+  window.addEventListener('resize',level);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(level);
+ }
+ /* Eridanus helpers: the real river, turned, fitted into a box, chapters spaced
+    evenly along its length (shared by the home sky, the Works page and phones) */
+ function eriFit(ang,W,H,LBL,TOP,BOT){
+  var path=SKYFIG.Eri.lines[0],ca=Math.cos(ang),sa=Math.sin(ang);
+  var R=path.map(function(q){return {x:q[0]*ca-q[1]*sa,y:q[0]*sa+q[1]*ca};});
+  var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  R.forEach(function(q){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y);});
+  var S=Math.min((W-2*LBL)/(x1-x0),(H-TOP-BOT)/(y1-y0));
+  var oy=TOP+((H-TOP-BOT)-(y1-y0)*S)/2;
+  return R.map(function(q){return {x:W/2+(q.x-(x0+x1)/2)*S,y:oy+(q.y-y0)*S};});
+ }
+ function eriPick(P,n){
+  /* which of the river's stars carry chapters: in order along the river, choosing the
+     set whose two closest consecutive chapters are as far apart as possible, so close
+     star pairs never both carry one (easy to click at any chapter count). Ties go to
+     the more even spacing along the river's length. */
+  var m=P.length,pick={},k,i,j;
+  if(n>=m){for(k=0;k<m;k++)pick[k]=k;return pick;}
+  if(n<=1){pick[0]=0;return pick;}
+  function d(a,b){return Math.hypot(P[a].x-P[b].x,P[a].y-P[b].y);}
+  /* best[c][j]: best minimum gap using c+1 chapters ending at star j; sum = total gap (tie-break) */
+  var best=[],sum=[],from=[];
+  for(k=0;k<n;k++){best.push([]);sum.push([]);from.push([]);}
+  for(j=0;j<m;j++){best[0][j]=Infinity;sum[0][j]=0;from[0][j]=-1;}
+  for(k=1;k<n;k++)for(j=k;j<m;j++){
+   best[k][j]=-1;sum[k][j]=0;from[k][j]=-1;
+   for(i=k-1;i<j;i++){
+    if(best[k-1][i]<0)continue;
+    var v=Math.min(best[k-1][i],d(i,j)),s=sum[k-1][i]+Math.min(d(i,j),60);
+    if(v>best[k][j]+1e-9||(Math.abs(v-best[k][j])<1e-9&&s>sum[k][j])){best[k][j]=v;sum[k][j]=s;from[k][j]=i;}
+   }
+  }
+  var end=m-1;
+  for(j=n-1;j<m;j++)if(best[n-1][j]>best[n-1][end]+1e-9)end=j;
+  for(k=n-1,j=end;k>=0;k--){pick[j]=k;j=from[k][j];}
+  return pick;
+ }
+ function riverLine(svg,P){
+  var g=el('g',null,svg);
+  for(var k=1;k<P.length;k++)el('line',{x1:P[k-1].x.toFixed(1),y1:P[k-1].y.toFixed(1),x2:P[k].x.toFixed(1),y2:P[k].y.toFixed(1),
+   'class':'cline','stroke-width':'1'},g);
+ }
+ var ERI_TURN=-26*Math.PI/180;
+ /* the turn that stands the river on end: its first-to-last star axis becomes vertical */
+ function eriUpright(){
+  var path=SKYFIG.Eri.lines[0],a=path[0],b=path[path.length-1];
+  return Math.PI/2-Math.atan2(b[1]-a[1],b[0]-a[0]);
+ }
+ /* the Works constellation is ERIDANUS, the river (Div, Nov 22 2026): its real 27-star
+    line, chapters on evenly spaced stars along it in index order from the north end,
+    the in-between stars kept small so the figure stays whole */
+ function worksSky(sky,items){
+  var n=items.length,W=1200,H=560,cx=W/2;
+  var P=eriFit(ERI_TURN,W,H,190,22,58),pick=eriPick(P,n);
+  var svg=el('svg',{viewBox:'0 0 '+W+' '+H,'class':'chart works-chart',role:'img',
+   'aria-label':'Works, drawn as the constellation Eridanus: one star per chapter'});
+  bgStars(el('g',null,svg),'homesky',60,W,H);
+  riverLine(svg,P);
+  var labels=[];
+  P.forEach(function(p,j){
+   if(!(j in pick)){el('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:'1.3','class':'star dimstar'},svg);return;}
+   var it=items[pick[j]],i=pick[j];
+   var a=el('a',{href:it.href},svg);
+   a.setAttribute('aria-label',it.t+(it.pages?', '+it.pages+' pages':''));
+   if(!reduced.matches){
+    a.addEventListener('click',function(e){
+     if(current()!=='night')return;
+     e.preventDefault();
+     zoomLeave(null,it.href,'in');
+    });
+   }
+   el('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:'20',fill:'none','pointer-events':'all'},a);
+   starDot(a,p.x.toFixed(1),p.y.toFixed(1),i===0?3.6:2.6,i===0);
+   var nm=it.t.length>26?it.t.slice(0,24)+'…':it.t;
+   var right=p.x>=cx;
+   var tl=el('text',{x:(p.x+(right?14:-14)).toFixed(1),y:(p.y+4.5).toFixed(1),'class':'starlabel','text-anchor':right?'start':'end'},a);
+   tl.textContent=nm;
+   labels.push({t:tl,sx:p.x,sy:p.y,by:p.y+4.5,right:right});
+  });
+  var wl=el('a',{href:'works.html'},svg);
+  wl.setAttribute('aria-label','Works, the whole index');
+  txt('Works',{x:cx,y:H-14,'class':'cname','font-size':'21','text-anchor':'middle'},wl);
+  sky.appendChild(svg);
+  pendingLabels={list:labels,w:W,h:H,dots:P};
+  requestAnimationFrame(untangleLabels);
+ }
+ /* Orion, Capricornus, Libra, Ursa Major, Cetus and Hydra: far back, dim, never
+    joined to each other or to the river (Div, Nov 22 2026) */
+ /* [id, side, inset % from that side, top %, width px] in a full-screen layer, so
+    they use the screen's edges, not the centred sky box (Div, Nov 22) */
+ var BGFIGS=[['Cap','left',2,9,170],['Ori','left',5,36,190],['Hya','left',1.5,76,300],
+  ['UMa','right',3,30,240],['Lib','right',13,55,110],['Cet','right',2,72,220]];
+ function bgFigures(){
+  if(document.querySelector('.bgfigs'))return;
+  var layer=document.createElement('div');
+  layer.className='bgfigs';layer.setAttribute('aria-hidden','true');
+  BGFIGS.forEach(function(f){
+   var F=SKYFIG[f[0]];if(!F)return;
+   var w=f[4],h=Math.round(w*F.h/F.w),pad=6;
+   var s=el('svg',{viewBox:(-w/2-pad)+' '+(-h/2-pad)+' '+(w+2*pad)+' '+(h+2*pad),'class':'bgfig'},layer);
+   s.style[f[1]]=f[2]+'%';s.style.top=f[3]+'%';s.style.width=(w+2*pad)+'px';
+   var sc=w/F.w,seen={};
+   F.lines.forEach(function(ln){
+    for(var i=1;i<ln.length;i++)el('line',{x1:(ln[i-1][0]*sc).toFixed(1),y1:(ln[i-1][1]*sc).toFixed(1),
+     x2:(ln[i][0]*sc).toFixed(1),y2:(ln[i][1]*sc).toFixed(1),'class':'bgline'},s);
+    ln.forEach(function(q){
+     var key=q[0]+','+q[1];if(seen[key])return;seen[key]=1;
+     el('circle',{cx:(q[0]*sc).toFixed(1),cy:(q[1]*sc).toFixed(1),r:'1.4','class':'bgstar'},s);
+    });
+   });
+  });
+  document.body.appendChild(layer);
+ }
  function buildHomeList(sky,data){
   var list=document.createElement('div');
   list.className='sky-list';
+  var hasWorks=typeof SKYFIG!=='undefined'&&data.sections.some(function(s){return /^works$/i.test(s.name);});
+  if(hasWorks){
+   /* phones (Div, Nov 22): About is ONE star right under the intro, then Works as the
+      river, bigger and further down */
+   list.classList.add('sky-list-works');
+   var secs=data.sections.slice().sort(function(x,y){return (/about/i.test(y.name)?1:0)-(/about/i.test(x.name)?1:0);});
+   secs.forEach(function(s){
+    var isW=/^works$/i.test(s.name);
+    var it=listItem(s.href,s.name,s.sub,isW?eriGlyph():
+     '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="3.6" class="star"/>'+
+     '<path d="M23 9 V37 M9 23 H37" class="glint" stroke-width=".8"/><path d="M15 15 L31 31 M31 15 L15 31" class="glint" stroke-width=".5" opacity=".55"/></svg>');
+    it.classList.add(isW?'works-item':'about-item');
+    list.appendChild(it);
+   });
+   sky.appendChild(list);
+   return;
+  }
   data.sections.forEach(function(s){
    list.appendChild(listItem(s.href,s.name,s.sub,miniConst(s.name,s.count)));
   });
   sky.appendChild(list);
+ }
+ function eriGlyph(){
+  var path=SKYFIG.Eri.lines[0],ang=-26*Math.PI/180,ca=Math.cos(ang),sa=Math.sin(ang);
+  var R=path.map(function(q){return {x:q[0]*ca-q[1]*sa,y:q[0]*sa+q[1]*ca};});
+  var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  R.forEach(function(q){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y);});
+  var W=120,pad=6,s=(W-2*pad)/(x1-x0),H=Math.round((y1-y0)*s+2*pad);
+  var pts=R.map(function(q){return [((q.x-x0)*s+pad).toFixed(1),((q.y-y0)*s+pad).toFixed(1)];});
+  var out='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">';
+  out+='<polyline points="'+pts.map(function(q){return q.join(',');}).join(' ')+'" fill="none" stroke="#cdd8ff" stroke-opacity=".45" stroke-width="1"/>';
+  pts.forEach(function(q,j){out+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+(j===0?2.6:1.5)+'" fill="#eef2ff"/>';});
+  return out+'</svg>';
  }
  /* a small real constellation for one section, same seed as the big sky */
  function miniConst(name,count){
@@ -393,6 +580,7 @@
   hand.textContent=numWord(items.length)+(isBlog?' to read':' to visit');
   chart.appendChild(hand);
   var W=640,H=560,cx=320,cy=268,n=items.length;
+  if(/^works$/i.test(name)&&typeof SKYFIG!=='undefined'){worksPageSky(sky,chart,hand,items,name);return;}
   var R=Math.min(210,100+n*16);
   var svg=el('svg',{viewBox:'0 0 '+W+' '+H,'class':'chart',role:'img',
    'aria-label':name+' constellation, one star per '+(isBlog?'post':'project')});
@@ -477,6 +665,87 @@
   cm.appendChild(msvg);
   sky.appendChild(cm);
  }
+ /* the Works page: the same river as the home sky, labelled with page counts (desktop);
+    phones get the river with numbered stars and a numbered list under it */
+ function worksPageSky(sky,chart,hand,items,name){
+  sky.classList.add('works-sky');
+  var n=items.length,W=760,H=760;
+  var P=eriFit(eriUpright(),W,H,130,24,24),pick=eriPick(P,n);
+  var svg=el('svg',{viewBox:'0 0 '+W+' '+H,'class':'chart',role:'img',
+   'aria-label':'Works, drawn as the constellation Eridanus: one star per chapter'});
+  bgStars(el('g',null,svg),name+'sky',42,W,H);
+  riverLine(svg,P);
+  var labels=[];
+  P.forEach(function(p,j){
+   if(!(j in pick)){el('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:'1.3','class':'star dimstar'},svg);return;}
+   var i=pick[j],it=items[i];
+   var a=el('a',{href:it.href},svg);
+   a.setAttribute('aria-label',it.label+(it.pages?', '+it.pages:''));
+   starLink(a,it.href);
+   el('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:'20',fill:'none','pointer-events':'all'},a);
+   starDot(a,p.x.toFixed(1),p.y.toFixed(1),i===0?3.6:2.5,i===0);
+   var nm=it.label.length>30?it.label.slice(0,28)+'\u2026':it.label;
+   var right=p.x>=W/2;
+   var t=el('text',{x:(p.x+(right?14:-14)).toFixed(1),y:(p.y+4.5).toFixed(1),'class':'starlabel','text-anchor':right?'start':'end'},a);
+   t.textContent=nm;  /* name only: page counts live in the hover text and the day index */
+   labels.push({t:t,sx:p.x,sy:p.y,by:p.y+4.5,right:right});
+  });
+  chart.appendChild(svg);
+  sky.appendChild(chart);
+  pendingLabels={list:labels,w:W,h:H,dots:P,near:4};
+  requestAnimationFrame(untangleLabels);
+  var back=document.createElement('div');
+  back.className='sky-back';
+  back.innerHTML='<a></a>';
+  var ba=back.querySelector('a');
+  ba.href='index.html';ba.textContent='back to the whole sky';
+  starLink(ba,'index.html','out');
+  sky.appendChild(back);
+  /* phones: the river, upright, numbered; the names in a list beneath it */
+  var cm=document.createElement('div');
+  cm.className='sky-chart-m works-m';
+  var MW=420,MH=520;
+  var Q=eriFit(0,MW,MH,40,20,20),qp=eriPick(Q,n);
+  var ms=el('svg',{viewBox:'0 0 '+MW+' '+MH,'class':'chartm',role:'img',
+   'aria-label':'Works, drawn as the constellation Eridanus, stars numbered as in the list below'});
+  bgStars(el('g',null,ms),name+'skym',26,MW,MH);
+  riverLine(ms,Q);
+  Q.forEach(function(p,j){
+   if(!(j in qp)){el('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:'1.6','class':'star dimstar'},ms);return;}
+   var i=qp[j],it=items[i];
+   var a=el('a',{href:it.href},ms);
+   a.setAttribute('aria-label',(i+1)+'. '+it.label);
+   starLink(a,it.href);
+   el('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:'18',fill:'none','pointer-events':'all'},a);
+   starDot(a,p.x.toFixed(1),p.y.toFixed(1),i===0?4:3,i===0);
+   var right=p.x<MW/2;
+   var t=el('text',{x:(p.x+(right?12:-12)).toFixed(1),y:(p.y+5).toFixed(1),'class':'starnum','text-anchor':right?'start':'end'},a);
+   t.textContent=String(i+1);
+  });
+  cm.appendChild(ms);
+  var ol=document.createElement('ol');
+  ol.className='works-list';
+  items.forEach(function(it,i){
+   var li=document.createElement('li');
+   var a=document.createElement('a');
+   a.href=it.href;
+   a.innerHTML='<i></i><b></b>';
+   a.querySelector('i').textContent=String(i+1);
+   a.querySelector('b').textContent=it.label;
+   starLink(a,it.href);
+   li.appendChild(a);ol.appendChild(li);
+  });
+  cm.appendChild(ol);
+  sky.appendChild(cm);
+ }
+ function starLink(a,href,mode){
+  if(reduced.matches)return;
+  a.addEventListener('click',function(e){
+   if(current()!=='night')return;
+   e.preventDefault();
+   zoomLeave(null,href,mode||'in');
+  });
+ }
  /* section-sky labels must never sit on each other: two stars at the same
     height used to print their names on top of one another. once the chart is
     in the page, measure every label box, then settle them one by one, top to
@@ -487,7 +756,7 @@
  var pendingLabels=null;
  function untangleLabels(){
   if(!pendingLabels)return;
-  var list=pendingLabels.list,W=pendingLabels.w,H=pendingLabels.h,GAP=14,PAD=2,i,bb;
+  var list=pendingLabels.list,W=pendingLabels.w,H=pendingLabels.h,DOTS=pendingLabels.dots||[],NEAR=pendingLabels.near||14,GAP=14,PAD=2,i,bb;
   for(i=0;i<list.length;i++){
    try{bb=list[i].t.getBBox();}catch(e){return;}
    if(!bb.width)return; /* not rendered yet: keep it pending */
@@ -505,11 +774,15 @@
     var p=placed[k];
     if(b.x<p.x+p.w+PAD&&p.x<b.x+b.w+PAD&&b.y<p.y+p.h+PAD&&p.y<b.y+b.h+PAD)return false;
    }
+   for(var d=0;d<DOTS.length;d++){
+    var q=DOTS[d];
+    if(q.x>b.x-5&&q.x<b.x+b.w+5&&q.y>b.y-5&&q.y<b.y+b.h+5)return false;
+   }
    return true;
   }
   order.forEach(function(L){
    var steps=[0],s,si,flip,pick=null;
-   for(s=1;s<=14;s++){steps.push(s*9);steps.push(-s*9);}
+   for(s=1;s<=NEAR;s++){steps.push(s*9);steps.push(-s*9);}
    for(si=0;si<steps.length&&!pick;si++){
     for(flip=0;flip<2&&!pick;flip++){
      var right=flip?!L.right:L.right;
@@ -681,7 +954,7 @@
   var bn=decodeURIComponent(location.pathname).split('/').pop();
   if(bn&&bn.indexOf('.')<0)bn+='.html';
   if(bn===''||bn==='index.html')return 'home';
-  if(bn==='marketing.html'||bn==='design.html'||bn==='blog.html')return 'section';
+  if(bn==='works.html'||bn==='marketing.html'||bn==='design.html'||bn==='blog.html')return 'section';
   if(bn==='about.html')return 'about';
   return null;
  }

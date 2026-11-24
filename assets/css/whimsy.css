@@ -235,3 +235,11 @@ button.wtool{font-size:13px}
 /* views arrive with a breath, not a blink */
 .wsecview,.wpaperview{animation:wvin .18s ease-out}
 @keyframes wvin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* Works index (Nov 2026): numbered chapter lines replace the doodle constellation */
+.wworks{flex:1.1;list-style:none;margin:0;padding:0;align-self:flex-start;display:flex;flex-direction:column}
+.wworks li{border-bottom:1px dashed #d8d3c4}
+.wworks .wstar{position:static;max-width:none;width:100%;transform:none;flex-direction:row;text-align:left;
+ padding:.45rem .25rem;gap:.6rem}
+.wworks .wstar i{font-style:normal;font-family:'Satisfy',cursive;color:#8a857b;min-width:1.6rem}
+.wworks .wstar svg{width:22px;height:22px}
+.wworks .wfav{width:22px;height:22px;flex:none;border-radius:5px;object-fit:contain}

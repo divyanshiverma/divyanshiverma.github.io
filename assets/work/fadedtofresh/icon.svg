@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="Faded to Fresh: Diagonal corner"><title>Faded to Fresh: Diagonal corner</title><defs>
+<clipPath id="photo"><path d="M24 20H76V74H24Z"/></clipPath>
+<clipPath id="fresh"><path d="M20 67 80 21V80H20Z"/></clipPath>
+<linearGradient id="wash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E7E0D3"/><stop offset=".55" stop-color="#C7BCA8"/><stop offset="1" stop-color="#B7B9B3"/></linearGradient>
+<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.05"/></filter>
+<filter id="wear" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".18" numOctaves="2" seed="8" result="grain"/><feDisplacementMap in="SourceGraphic" in2="grain" scale="3" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation=".35"/></filter>
+</defs><g transform=""><g transform="rotate(0 50 50)">
+<rect x="17" y="13" width="66" height="76" rx="2" fill="#FFFFFF" stroke="#243B53" stroke-width="5"/>
+<g clip-path="url(#photo)"><path d="M24 20H76V74H24Z" fill="url(#wash)"/>
+<circle cx="50" cy="40" r="11" fill="#92999E"/><path d="M29 78V67a21 21 0 0 1 42 0v11" fill="#92999E"/>
+<g opacity=".85"><path d="M24 20h17l-5 5-8-1v11l-4 5Z" fill="#F8F5ED"/><path d="M24 48l4 4-1 15 7 7H24Z" fill="#F8F5ED"/></g>
+<g clip-path="url(#fresh)"><path d="M24 20H76V74H24Z" fill="#FFBE32"/><circle cx="50" cy="40" r="11" fill="#EBA46B"/><path d="M29 78V67a21 21 0 0 1 42 0v11" fill="#CB285E"/></g>
+</g></g></g></svg>

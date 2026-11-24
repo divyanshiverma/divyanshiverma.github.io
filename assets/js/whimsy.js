@@ -120,10 +120,9 @@
  var fgEl,bgEl;
  var COLORS=['#1D1615','#5f5a4e','#B72025','#E3554A','#FFBF00','#F4A300','#87AE73','#2E8B57','#1A2421','#9fc0ff','#32127A','#1F0954','#111b36','#F16C95',
   '#ffffff','#FFF9EE','#EBE8DE','#f7c8d4','#ffe9c9','#cde8c0','#dfe8ff','#c9b8f0','#8ea3c4','#e6a3a3','#f0d9a8','#b8d8c8','#d8d0f0','#f5b8cd'];
+ /* Home · Works · About (Div, Nov 21 2026): the menu is works + about */
  var SECTIONS=[
-  {name:'Marketing',href:'marketing.html',c:'rgba(183,32,37,.4)'},
-  {name:'Design',href:'design.html',c:'rgba(46,139,87,.45)'},
-  {name:'Blog',href:'blog.html',c:'rgba(241,108,149,.5)'},
+  {name:'Works',href:'works.html',c:'rgba(46,139,87,.45)'},
   {name:'About',href:'about.html',c:'rgba(50,18,122,.4)'}];
  function el(tag,cls,parent){
   var d=document.createElement(tag);
@@ -959,7 +958,7 @@
    var items=[];
    doc.querySelectorAll('table.idx tbody tr').forEach(function(tr){
     var a=tr.querySelector('td a');
-    if(a)items.push({t:a.textContent.replace(/\s*\(.*\)$/,'').trim(),href:a.getAttribute('href')});
+    if(a)items.push({t:a.textContent.replace(/\s*\(.*\)$/,'').trim(),href:a.getAttribute('href'),icon:a.getAttribute('data-icon')});
    });
    return {leads:leads,items:items};
   });
@@ -1053,6 +1052,9 @@
    buildSectionView(sec,d);
   });
  }
+ /* Works opens on an INDEX (Div, Nov 21 2026): one numbered line per chapter, each
+    with its little doodle; opening one turns into the paper, and the paper's arrows
+    walk on through every chapter in index order. */
  function buildSectionView(sec,d){
   viewEl.innerHTML='';
   var sv=el('div','wsecview',viewEl);
@@ -1060,49 +1062,21 @@
   var h=el('h3',null,tx);
   h.textContent=sec.name;
   var hint=el('p','whand',tx);
-  hint.textContent='each little drawing is one page, open it';
+  hint.textContent='the index: every line is a chapter, open any';
   d.leads.forEach(function(txt){var pp=el('p',null,tx);pp.textContent=txt;});
-  var cons=el('div','wcons',sv);
-  var n=Math.max(1,d.items.length);
-  var pts=d.items.map(function(it,i){
-   var hsh=hashStr(it.t);
-   var x=(i%2)?(50+(hsh%22)):(6+(hsh%22));
-   var y=6+i*(78/Math.max(1,n-1));
-   return {x:x,y:y};
-  });
-  var NS='http://www.w3.org/2000/svg';
-  var lines=document.createElementNS(NS,'svg');
-  lines.setAttribute('class','wconlines');
-  lines.setAttribute('aria-hidden','true');
-  var path=document.createElementNS(NS,'path');
-  lines.appendChild(path);
-  cons.appendChild(lines);
+  var ix=el('ol','wworks',sv);
   setTimeout(function(){d.items.forEach(function(it){fetchDoc(it.href);});},300);
   d.items.forEach(function(it,i){
-   var b=el('button','wstar'+((i%2)?' flip':''),cons);
+   var li=el('li',null,ix);
+   var b=el('button','wstar',li);
    b.type='button';
-   b.style.left=pts[i].x+'%';
-   b.style.top=pts[i].y+'%';
-   b.innerHTML=DOODLES[((DOODLE_OFF[sec.name]||0)+i)%DOODLES.length]+'<span></span>';
+   /* each line wears its site's own favicon (Div, Nov 22); studies without a site keep a doodle */
+   var mark=it.icon?'<img class="wfav" src="'+it.icon+'" alt="" width="22" height="22" loading="lazy">'
+    :DOODLES[((DOODLE_OFF[sec.name]||0)+i)%DOODLES.length];
+   b.innerHTML='<i>'+(i<9?'0':'')+(i+1)+'</i>'+mark+'<span></span>';
    b.querySelector('span').textContent=it.t;
    b.addEventListener('click',function(){openProject(sec.name,it,d.items,i);});
   });
-  /* connect-the-dots through the doodles' real pixel centres, so the line
-     meets its drawings on every screen size */
-  function drawLine(){
-   if(!cons.isConnected)return;
-   var r=cons.getBoundingClientRect();
-   if(r.width<10)return;
-   lines.setAttribute('viewBox','0 0 '+Math.round(r.width)+' '+Math.round(r.height));
-   var dd='';
-   [].slice.call(cons.querySelectorAll('.wstar svg')).forEach(function(ic,i){
-    var br=ic.getBoundingClientRect();
-    dd+=(i?'L':'M')+(br.left-r.left+br.width/2).toFixed(1)+' '+(br.top-r.top+br.height/2).toFixed(1)+' ';
-   });
-   path.setAttribute('d',dd);
-  }
-  requestAnimationFrame(drawLine);
-  window.addEventListener('resize',drawLine);
  }
  function openProject(secName,it,items,idx){
   /* items/idx: the section's page list, so the paper's arrows can walk to the
